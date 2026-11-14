@@ -407,11 +407,12 @@ if IMAGES_DIR.exists():
     app.mount("/images", StaticFiles(directory=str(IMAGES_DIR)), name="images")
 
 if FRONTEND_DIR.exists():
-    # Serve locales
+    # /static/ mount — the HTML references /static/css/, /static/js/ etc.
+    app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static_frontend")
+    # Serve locales at both paths
     locales_dir = FRONTEND_DIR / "locales"
     if locales_dir.exists():
         app.mount("/locales", StaticFiles(directory=str(locales_dir)), name="locales")
-        app.mount("/static/locales", StaticFiles(directory=str(locales_dir)), name="static_locales")
 
 PAGE_MAP = {
     "/": "index.html", "/analytics": "analytics.html", "/explorer": "explorer.html",
