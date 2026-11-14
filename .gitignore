@@ -1,0 +1,12 @@
+node_modules/
+.next/
+__pycache__/
+*.pyc
+*.pyo
+backend/psi.db
+backend/model.pkl
+backend/.env
+.env
+.DS_Store
+Thumbs.db
+tmp/
