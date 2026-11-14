@@ -10,3 +10,4 @@ backend/.env
 .DS_Store
 Thumbs.db
 tmp/
+frontend-nextjs/

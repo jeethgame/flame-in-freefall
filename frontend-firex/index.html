@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/jpeg" href="/images/Fire-X.jpeg">
+<link rel="apple-touch-icon" href="/images/Fire-X.jpeg">
+<title>NASA FIRE-X — Flame in Freefall</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/ds.css">
+<link rel="stylesheet" href="/static/css/nav.css">
+<style>
+/* PAGE-SPECIFIC */
+#particles-canvas { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.hero {
+  position: relative; height: 100vh; min-height: 700px;
+  display: flex; align-items: center;
+  overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background-image: url('/images/hero_bg.jpg');
+  background-size: cover; background-position: center;
+  filter: brightness(0.45);
+}
+.hero-overlay {
+  position: absolute; inset: 0; z-index: 2;
+  background: linear-gradient(to bottom,
+    rgba(2,4,9,0.1) 0%,
+    rgba(2,4,9,0.3) 50%,
+    rgba(2,4,9,0.95) 85%,
+    #020409 100%
+  );
+}
+.hero-content {
+  position: relative; z-index: 3;
+  max-width: 900px; padding: 0 24px;
+  margin: 0 auto; text-align: center;
+  margin-top: 68px;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(0,245,255,0.08); border: 1px solid rgba(0,245,255,0.25);
+  padding: 6px 16px; border-radius: 100px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; font-weight: 700; color: rgba(0,245,255,0.9);
+  letter-spacing: 0.12em; text-transform: uppercase;
+  margin-bottom: 28px;
+  animation: slideDown 0.8s ease-out;
+}
+.hero-badge-dot { width: 6px; height: 6px; background: #00E676; border-radius: 50%; box-shadow: 0 0 8px #00E676; animation: glowPulse 2s infinite; }
+@keyframes glowPulse { 0%,100% { box-shadow: 0 0 6px #00E676; } 50% { box-shadow: 0 0 16px #00E676, 0 0 32px rgba(0,230,118,0.4); } }
+.hero-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 800; line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: #fff; margin-bottom: 12px;
+  animation: slideUp 1s ease-out 0.2s both;
+}
+.hero-subtitle-line {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+  font-weight: 600; color: rgba(255,255,255,0.7);
+  margin-bottom: 24px;
+  animation: slideUp 1s ease-out 0.35s both;
+}
+.hero-desc {
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  color: rgba(255,255,255,0.55);
+  max-width: 680px; margin: 0 auto 40px;
+  line-height: 1.7;
+  animation: slideUp 1s ease-out 0.5s both;
+}
+.hero-actions {
+  display: flex; align-items: center; justify-content: center;
+  gap: 16px; flex-wrap: wrap;
+  animation: slideUp 1s ease-out 0.65s both;
+}
+.hero-clock {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem; color: rgba(255,255,255,0.4);
+  margin-top: 32px;
+  animation: slideUp 1s ease-out 0.8s both;
+  justify-content: center;
+}
+.hero-clock-val { color: rgba(0,245,255,0.8); font-weight: 600; }
+.scroll-indicator {
+  position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+  z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.scroll-indicator span { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; text-transform: uppercase; }
+.scroll-arrow { color: rgba(0,245,255,0.5); animation: bounce 2s infinite; }
+@keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* STATS BAND */
+.stats-band {
+  background: var(--bg-surface-1);
+  border-top: 1px solid rgba(0,245,255,0.06);
+  border-bottom: 1px solid rgba(0,245,255,0.06);
+  padding: 48px 0;
+}
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: rgba(0,245,255,0.06); }
+.stat-item {
+  background: var(--bg-surface-1); padding: 32px 24px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.stat-item::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.stat-item:hover::before { opacity: 1; }
+.stat-num { font-family: 'JetBrains Mono', monospace; font-size: 3.5rem; font-weight: 700; line-height: 1; }
+.stat-label { font-size: 0.78rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 10px; font-family: 'JetBrains Mono', monospace; }
+
+/* ABOUT SECTION */
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+.about-img-wrap {
+  position: relative;
+  perspective: 1200px;
+}
+.about-img {
+  width: 100%; border-radius: 16px;
+  border: 1px solid rgba(0,245,255,0.15);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 40px rgba(0,245,255,0.1);
+  transform: rotateY(-8deg) rotateX(4deg);
+  transition: transform 0.5s ease;
+}
+.about-img:hover { transform: rotateY(0) rotateX(0); }
+.about-img-badge {
+  position: absolute; bottom: -16px; right: -16px;
+  background: var(--bg-surface-2); border: 1px solid rgba(0,245,255,0.25);
+  padding: 12px 18px; border-radius: 12px;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+}
+.about-features { display: flex; flex-direction: column; gap: 16px; margin-top: 32px; }
+.feature-row {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 16px; border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: all 0.3s;
+}
+.feature-row:hover { background: rgba(0,245,255,0.04); border-color: rgba(0,245,255,0.12); }
+.feature-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: rgba(0,245,255,0.1); border: 1px solid rgba(0,245,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; color: var(--neon-cyan);
+}
+.feature-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
+.feature-desc { font-size: 0.82rem; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
+/* FAMILIES SCROLL */
+.families-carousel-wrapper { position: relative; }
+.families-scroll {
+  display: flex; gap: 20px;
+  overflow-x: auto; padding: 8px 4px 20px;
+  scroll-behavior: smooth;
+  /* Custom scrollbar */
+  scrollbar-width: auto;
+  scrollbar-color: rgba(0,245,255,0.5) rgba(255,255,255,0.04);
+}
+/* Chrome/Safari custom scrollbar */
+.families-scroll::-webkit-scrollbar { height: 6px; border-radius: 3px; }
+.families-scroll::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.04);
+  border-radius: 3px;
+  margin: 0 8px;
+}
+.families-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #00F5FF, #2979FF, #9B59B6);
+  border-radius: 3px;
+  box-shadow: 0 0 8px rgba(0,245,255,0.4);
+}
+.families-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, #33F7FF, #4A8AFF, #AF6EDA);
+  box-shadow: 0 0 14px rgba(0,245,255,0.7);
+}
+.family-card {
+  flex: 0 0 240px; background: var(--bg-surface-2);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px; padding: 24px;
+  cursor: pointer; transition: all 0.3s;
+  position: relative; overflow: hidden;
+}
+.family-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--card-accent, var(--neon-cyan));
+  box-shadow: 0 0 16px var(--card-accent, var(--neon-cyan));
+}
+.family-card:hover { transform: translateY(-6px); border-color: rgba(0,245,255,0.25); box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 30px rgba(0,245,255,0.1); }
+.family-name { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; }
+.family-count { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
+.family-desc { font-size: 0.82rem; color: rgba(255,255,255,0.55); line-height: 1.5; }
+
+/* MISSION ENV */
+.env-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.env-card {
+  background: var(--bg-surface-2);
+  border-radius: 20px; padding: 32px;
+  border: 1px solid rgba(255,255,255,0.06);
+  position: relative; overflow: hidden;
+  transition: all 0.3s;
+}
+.env-card::after {
+  content: ''; position: absolute;
+  inset: 0; border-radius: 20px;
+  background: radial-gradient(circle at 100% 0%, var(--env-color, rgba(0,245,255,0.08)) 0%, transparent 60%);
+  pointer-events: none;
+}
+.env-card:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+.env-label { font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+.env-name { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 800; margin-bottom: 24px; }
+.env-params { display: flex; gap: 16px; margin-bottom: 20px; }
+.env-param { display: flex; flex-direction: column; gap: 3px; }
+.env-param-val { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; }
+.env-param-label { font-size: 0.68rem; color: rgba(255,255,255,0.4); }
+.env-fhi { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.env-fhi-score { font-family: 'JetBrains Mono', monospace; font-size: 2rem; font-weight: 800; }
+
+/* NAV CARDS */
+.nav-cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.nav-card {
+  background: var(--bg-surface-2); border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px; padding: 28px 32px;
+  text-decoration: none; color: inherit;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: all 0.3s; position: relative; overflow: hidden;
+}
+.nav-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 0% 50%, rgba(0,245,255,0.05) 0%, transparent 60%);
+  opacity: 0; transition: opacity 0.3s;
+}
+.nav-card:hover { transform: translateX(4px); border-color: rgba(0,245,255,0.2); box-shadow: 0 0 30px rgba(0,245,255,0.08); }
+.nav-card:hover::before { opacity: 1; }
+.nav-card-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+.nav-card-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; font-weight: 700; margin-bottom: 6px; }
+.nav-card-desc { font-size: 0.82rem; color: rgba(255,255,255,0.5); line-height: 1.5; }
+.nav-card-arrow { color: rgba(255,255,255,0.2); transition: all 0.3s; flex-shrink: 0; }
+.nav-card:hover .nav-card-arrow { color: var(--neon-cyan); transform: translateX(4px); }
+
+/* FOOTER */
+.footer { border-top: 1px solid rgba(0,245,255,0.06); background: #020409; padding: 48px 0 32px; margin-top: 0; }
+.footer-inner { display: flex; align-items: flex-start; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
+.footer-brand-logo { width: 40px; height: 40px; border-radius: 8px; border: 1px solid rgba(0,245,255,0.2); }
+.footer-brand-name { font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 1.1rem; color: #fff; letter-spacing: 0.05em; }
+.footer-bottom { display: flex; align-items: center; justify-content: space-between; padding-top: 24px; margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); flex-wrap: wrap; gap: 12px; }
+.footer-bottom p { font-size: 0.78rem; color: rgba(255,255,255,0.3); font-family: 'JetBrains Mono', monospace; }
+
+@media (max-width: 1024px) { .about-grid { grid-template-columns: 1fr; } .env-grid { grid-template-columns: 1fr; } }
+@media (max-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .nav-cards-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="nav-progress-bar" id="nav-progress"></div>
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">
+      <img src="/images/Fire-X.jpeg" alt="FIRE-X" class="nav-brand-logo">
+      <div class="nav-brand-text">
+        <div class="nav-brand-name">NASA FIRE-X</div>
+        <div class="nav-brand-sub">MICROGRAVITY COMBUSTION INTEL</div>
+      </div>
+    </a>
+    <ul class="nav-links" id="nav-links-list">
+      <li><a href="/" class="nav-link">Home</a></li>
+      <li><a href="/analytics" class="nav-link">Analytics</a></li>
+      <li><a href="/explorer" class="nav-link">Data Explorer</a></li>
+      <li><a href="/simulator" class="nav-link">Simulator</a></li>
+      <li><a href="/hardware" class="nav-link">Hardware</a></li>
+      <li><a href="/ai" class="nav-link">AI Assistant</a></li>
+      <li><a href="/about" class="nav-link">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <div style="display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:#00E676;border:1px solid rgba(0,230,118,0.25);background:rgba(0,230,118,0.08);padding:5px 12px;border-radius:100px">
+        <div class="nav-status-dot"></div> LIVE
+      </div>
+      <button class="nav-lang-btn" id="nav-lang-btn">EN</button>
+      <a href="/ai" class="nav-ai-btn">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        AI Assistant
+      </a>
+      <button class="mobile-menu-btn" id="mobile-menu-btn">
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <canvas id="particles-canvas"></canvas>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <div class="hero-badge-dot"></div>
+      NASA SPACE APPS CHALLENGE 2026 &nbsp;·&nbsp; FIRE SAFETY IN SPACE
+    </div>
+    <h1 class="hero-title">
+      <span class="text-gradient">FLAME IN FREEFALL</span>
+    </h1>
+    <div class="hero-subtitle-line">SI-Powered Fire Safety Insights from Microgravity Combustion Data</div>
+    <p class="hero-desc">892 verified microgravity &amp; ground-bound combustion experiments analyzed by SI/AI + SQL-RAG — powering spacecraft fire safety across the ISS, Artemis Lunar Base, Martian Base, Pressurized Rover, and EVA Spacesuit.</p>
+    <div class="hero-actions">
+      <a href="/explorer" class="btn btn-solid-cyan btn-lg">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Explore Data
+      </a>
+      <a href="/simulator" class="btn btn-neon btn-lg">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/></svg>
+        Launch Simulator
+      </a>
+    </div>
+    <div class="hero-clock">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+      MISSION TIME (UTC): <span class="hero-clock-val" id="hero-clock-val">—</span>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <svg class="scroll-arrow" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6,9 12,15 18,9"/></svg>
+  </div>
+</section>
+
+<!-- STATS BAND -->
+<div class="stats-band">
+  <div class="stats-grid">
+    <div class="stat-item">
+      <div class="stat-num text-gradient" id="stat-exp">892</div>
+      <div class="stat-label">Canonical Experiments</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" style="color:#FF6B35" id="stat-fam">29</div>
+      <div class="stat-label">Flight &amp; Ground Suites</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" style="color:#9B59B6" id="stat-scen">7</div>
+      <div class="stat-label">Mission Environments</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" style="color:#00E676" id="stat-int">99.8%</div>
+      <div class="stat-label">Data Integrity</div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ABOUT -->
+<section class="section">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-img-wrap reveal">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/International_Space_Station_after_undocking_of_STS-132.jpg/1280px-International_Space_Station_after_undocking_of_STS-132.jpg"
+             alt="ISS" class="about-img" loading="lazy">
+        <div class="about-img-badge">
+          <div style="font-size:0.65rem;color:rgba(255,255,255,0.4);margin-bottom:4px">PLATFORM</div>
+          <div style="color:#00F5FF;font-weight:700">Intl. Space Station</div>
+          <div style="font-size:0.65rem;color:rgba(255,255,255,0.5)">Orbit: 408 km | Speed: 27,600 km/h</div>
+        </div>
+      </div>
+      <div class="reveal reveal-delay-2">
+        <div class="section-eyebrow">About the Project</div>
+        <h2 class="section-title-xl" style="margin-bottom:16px">Fire Safety Science <span class="text-gradient">in Orbit</span></h2>
+        <p style="color:rgba(255,255,255,0.6);line-height:1.8;margin-bottom:32px">FIRE-X aggregates and analyzes NASA's most comprehensive microgravity combustion database. Without gravity, fire behaves fundamentally differently — flames become spherical, cool flames persist, and conventional fire safety wisdom no longer applies.</p>
+        <div class="about-features">
+          <div class="feature-row">
+            <div class="feature-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+            <div>
+              <div class="feature-title">892 Verified Experiments</div>
+              <div class="feature-desc">From FLEX droplet flames (He/CO₂ diluents) and ACME CFI-G (85% O₂) to SAFFIRE spacecraft burns and DAFT lunar dust vs smoke.</div>
+            </div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-icon" style="background:rgba(255,107,53,0.1);border-color:rgba(255,107,53,0.2);color:#FF6B35"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12,2 22,8.5 22,15.5 12,22 2,15.5 2,8.5"/></svg></div>
+            <div>
+              <div class="feature-title">AI + Live SQLite SQL-RAG</div>
+              <div class="feature-desc">OpenAI GPT-4o-mini grounded with live SQL queries against canonical NASA PSI data for hallucination-free scientific answers.</div>
+            </div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-icon" style="background:rgba(155,89,182,0.1);border-color:rgba(155,89,182,0.2);color:#9B59B6"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg></div>
+            <div>
+              <div class="feature-title">SI Investigation Ranking &amp; Simulator</div>
+              <div class="feature-desc">Rank all PSI investigations and model 0g–1g bounded fire hazards across ISS, Lunar Base, Martian Base, Rover, and EVA Suit.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- FLIGHT FAMILIES -->
+<section class="section" style="background:var(--bg-surface-1)">
+  <div class="container">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:40px" class="reveal">
+      <div>
+        <div class="section-eyebrow">Flight Investigations</div>
+        <h2 class="section-title-xl">29 <span class="text-gradient">Investigation Suites</span></h2>
+      </div>
+      <a href="/explorer" class="btn btn-ghost btn-sm">View All Data →</a>
+    </div>
+    <div class="families-carousel-wrapper">
+      <div class="families-scroll" id="families-scroll">
+      <div class="family-card" style="--card-accent:#00F5FF">
+        <div class="family-name">FLEX &amp; FLEX-2</div>
+        <div class="family-count">PSI-69 / PSI-70 · ISS CIR · 284 TESTS</div>
+        <div class="family-desc">Spherical droplet combustion, cool-flame kinetics, and He (up to 45%) / CO₂ (up to 70%) inert gas suppression.</div>
+      </div>
+      <div class="family-card" style="--card-accent:#FF6B35">
+        <div class="family-name">BASS-I &amp; II</div>
+        <div class="family-count">PSI-25 · ISS MSG · 137 TESTS</div>
+        <div class="family-desc">Burning and Suppression of Solids inside the ISS Microgravity Science Glovebox (MSG) under forced airflow.</div>
+      </div>
+      <div class="family-card" style="--card-accent:#FF1744">
+        <div class="family-name">SAFFIRE I–VI</div>
+        <div class="family-count">PSI-98 · CYGNUS · 19 BURNS</div>
+        <div class="family-desc">Large-scale spacecraft fire propagation &amp; exploration atmosphere (34% O₂, 8.2 psia) burns aboard Cygnus.</div>
+      </div>
+      <div class="family-card" style="--card-accent:#2979FF">
+        <div class="family-name">ACME (BRE/CFI-G/E-FIELD)</div>
+        <div class="family-count">PSI-112 · ISS CIR · 72 TESTS</div>
+        <div class="family-desc">Material emulator (BRE), electric-field partial-g mimic (E-FIELD), and inverted flames up to 85% O₂ (CFI-G).</div>
+      </div>
+      <div class="family-card" style="--card-accent:#9B59B6">
+        <div class="family-name">SOFIE</div>
+        <div class="family-count">PSI-84 · ISS CIR · 12 TESTS</div>
+        <div class="family-desc">Solid Fuel Ignition and Extinction boundary mapping inside the CIR GEL/MIST insert.</div>
+      </div>
+      <div class="family-card" style="--card-accent:#00E676">
+        <div class="family-name">SLICE &amp; SPICE</div>
+        <div class="family-count">ISS MSG · 11 TESTS</div>
+        <div class="family-desc">Co-flowing laminar jet diffusion flames and smoke point soot thresholds inside the ISS MSG SPICE flow duct.</div>
+      </div>
+      <div class="family-card" style="--card-accent:#00F5FF">
+        <div class="family-name">FLARE &amp; 0g–1g BOUND</div>
+        <div class="family-count">KIBO / GRC · 82 TESTS</div>
+        <div class="family-desc">Reduced-pressure O₂ MOC curves &amp; 0g–1g Partial-Gravity Bounding for Lunar (0.16g) and Martian (0.38g) bases pre-LUCI/FM2.</div>
+      </div>
+      <div class="family-card" style="--card-accent:#FFD700">
+        <div class="family-name">MGM</div>
+        <div class="family-count">STS / ISS · 65 EXPERIMENTS</div>
+        <div class="family-desc">Microgravity Smoldering Combustion. Porous polymer foam smoldering, toxic CO precursors, and flaming transition.</div>
+      </div>
+      <div class="family-card" style="--card-accent:#E040FB">
+        <div class="family-name">SAME / SAME-R / DAFT</div>
+        <div class="family-count">ISS MSG · 56 EXPERIMENTS</div>
+        <div class="family-desc">Smoke &amp; Aerosol Measurement + Dust and Aerosol (DAFT/DAFT-2) lunar regolith vs combustion smoke discrimination in MSG.</div>
+      </div>
+      <div class="family-card" style="--card-accent:#00B0FF">
+        <div class="family-name">GRC ZERO-G</div>
+        <div class="family-count">DROP TOWER · 95 EXPERIMENTS</div>
+        <div class="family-desc">NASA Glenn 2.2s &amp; 5.18s Zero-G Facility freefall droplet &amp; gas diffusion flame radiative quenching.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- MISSION ENVIRONMENTS -->
+<section class="section">
+  <div class="container">
+    <div class="reveal" style="text-align:center;margin-bottom:56px">
+      <div class="section-eyebrow" style="justify-content:center">Planetary Fire Risk</div>
+      <h2 class="section-title-xl">Mission <span class="text-gradient">Environments</span></h2>
+      <p class="section-desc" style="margin:0 auto;text-align:center">Fire behaves differently in every spacecraft atmosphere. The oxygen fraction and pressure define everything.</p>
+    </div>
+    <div class="env-grid">
+      <div class="env-card reveal" style="--env-color:rgba(41,121,255,0.1)">
+        <div class="env-label" style="color:#2979FF">Standard</div>
+        <div class="env-name">ISS Atmosphere</div>
+        <div class="env-params">
+          <div class="env-param">
+            <div class="env-param-val" style="color:#2979FF">21%</div>
+            <div class="env-param-label">Oxygen</div>
+          </div>
+          <div class="env-param">
+            <div class="env-param-val">101.3</div>
+            <div class="env-param-label">kPa</div>
+          </div>
+        </div>
+        <div class="env-fhi">
+          <div style="font-size:0.75rem;color:rgba(255,255,255,0.4)">Fire Hazard Index</div>
+          <div class="env-fhi-score" style="color:#2979FF">5.1</div>
+        </div>
+        <div class="hazard-gauge-track"><div class="hazard-gauge-fill" style="width:51%;background:#2979FF;color:#2979FF"></div></div>
+        <div style="margin-top:16px"><span class="badge badge-info">NOMINAL RISK</span></div>
+      </div>
+      <div class="env-card reveal reveal-delay-1" style="--env-color:rgba(255,107,53,0.1)">
+        <div class="env-label" style="color:#FF6B35">Artemis Program</div>
+        <div class="env-name">Lunar Habitat</div>
+        <div class="env-params">
+          <div class="env-param">
+            <div class="env-param-val" style="color:#FF6B35">34%</div>
+            <div class="env-param-label">Oxygen</div>
+          </div>
+          <div class="env-param">
+            <div class="env-param-val">56.5</div>
+            <div class="env-param-label">kPa</div>
+          </div>
+        </div>
+        <div class="env-fhi">
+          <div style="font-size:0.75rem;color:rgba(255,255,255,0.4)">Fire Hazard Index</div>
+          <div class="env-fhi-score" style="color:#FF6B35">8.3</div>
+        </div>
+        <div class="hazard-gauge-track"><div class="hazard-gauge-fill" style="width:83%;background:#FF6B35;color:#FF6B35"></div></div>
+        <div style="margin-top:16px"><span class="badge badge-elevated">ELEVATED HAZARD</span></div>
+      </div>
+      <div class="env-card reveal reveal-delay-2" style="--env-color:rgba(155,89,182,0.1)">
+        <div class="env-label" style="color:#9B59B6">Emergency Protocol</div>
+        <div class="env-name">Hypoxic Safe-Haven</div>
+        <div class="env-params">
+          <div class="env-param">
+            <div class="env-param-val" style="color:#9B59B6">15%</div>
+            <div class="env-param-label">Oxygen</div>
+          </div>
+          <div class="env-param">
+            <div class="env-param-val">70.3</div>
+            <div class="env-param-label">kPa</div>
+          </div>
+        </div>
+        <div class="env-fhi">
+          <div style="font-size:0.75rem;color:rgba(255,255,255,0.4)">Fire Hazard Index</div>
+          <div class="env-fhi-score" style="color:#9B59B6">2.1</div>
+        </div>
+        <div class="hazard-gauge-track"><div class="hazard-gauge-fill" style="width:21%;background:#9B59B6;color:#9B59B6"></div></div>
+        <div style="margin-top:16px"><span class="badge badge-nominal">SUPPRESSED</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- NAVIGATE TO OTHER PAGES -->
+<section class="section" style="background:var(--bg-surface-1)">
+  <div class="container">
+    <div class="reveal" style="text-align:center;margin-bottom:48px">
+      <div class="section-eyebrow" style="justify-content:center">Platform Modules</div>
+      <h2 class="section-title-xl">Explore the <span class="text-gradient">Platform</span></h2>
+    </div>
+    <div class="nav-cards-grid">
+      <a href="/analytics" class="nav-card reveal">
+        <div>
+          <div class="nav-card-icon" style="background:rgba(0,245,255,0.1);border:1px solid rgba(0,245,255,0.2);color:var(--neon-cyan)">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+          </div>
+          <div class="nav-card-title">Analytics Hub</div>
+          <div class="nav-card-desc">Interactive 3D charts — extinction scatter, airflow correlations, fuel distribution and outcome analysis.</div>
+        </div>
+        <svg class="nav-card-arrow" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg>
+      </a>
+      <a href="/explorer" class="nav-card reveal reveal-delay-1">
+        <div>
+          <div class="nav-card-icon" style="background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);color:#FF6B35">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+          <div class="nav-card-title">Data Explorer</div>
+          <div class="nav-card-desc">Browse, filter, and inspect all 892 NASA flight &amp; ground-bound experiments with full telemetry inspection.</div>
+        </div>
+        <svg class="nav-card-arrow" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg>
+      </a>
+      <a href="/simulator" class="nav-card reveal reveal-delay-2">
+        <div>
+          <div class="nav-card-icon" style="background:rgba(155,89,182,0.1);border:1px solid rgba(155,89,182,0.2);color:#9B59B6">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <div class="nav-card-title">Mission Simulator</div>
+          <div class="nav-card-desc">Simulate fire hazards &amp; SI Investigation Rankings across ISS, Lunar Base, Martian Base, Rover, and EVA Suit.</div>
+        </div>
+        <svg class="nav-card-arrow" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg>
+      </a>
+      <a href="/ai" class="nav-card reveal reveal-delay-3">
+        <div>
+          <div class="nav-card-icon" style="background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.2);color:#00E676">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          </div>
+          <div class="nav-card-title">AI Research Assistant</div>
+          <div class="nav-card-desc">Ask GPT-4o-mini + Live SQLite SQL-RAG specialized NASA combustion questions with ground-truth telemetry.</div>
+        </div>
+        <svg class="nav-card-arrow" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <img src="/images/Fire-X.jpeg" alt="FIRE-X" class="footer-brand-logo">
+          <div class="footer-brand-name">NASA FIRE-X</div>
+        </div>
+        <p style="font-size:0.82rem;color:rgba(255,255,255,0.35);max-width:320px;line-height:1.6">SI-Powered (Super Intelligence / AI) Fire Safety Insights from Microgravity Combustion Data. NASA Space Apps Challenge 2026.</p>
+      </div>
+      <div style="display:flex;gap:48px">
+        <div>
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.35);font-family:'JetBrains Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px">Platform</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <a href="/analytics" style="color:rgba(255,255,255,0.55);text-decoration:none;font-size:0.85rem;transition:color 0.2s" onmouseover="this.style.color='#00F5FF'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">Analytics Hub</a>
+            <a href="/explorer" style="color:rgba(255,255,255,0.55);text-decoration:none;font-size:0.85rem;transition:color 0.2s" onmouseover="this.style.color='#00F5FF'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">Data Explorer</a>
+            <a href="/simulator" style="color:rgba(255,255,255,0.55);text-decoration:none;font-size:0.85rem;transition:color 0.2s" onmouseover="this.style.color='#00F5FF'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">Mission Simulator</a>
+            <a href="/ai" style="color:rgba(255,255,255,0.55);text-decoration:none;font-size:0.85rem;transition:color 0.2s" onmouseover="this.style.color='#00F5FF'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">AI Assistant</a>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.35);font-family:'JetBrains Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px">Data</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <span style="color:rgba(255,255,255,0.55);font-size:0.85rem">NASA PSI</span>
+            <span style="color:rgba(255,255,255,0.55);font-size:0.85rem">NASA NTRS</span>
+            <span style="color:rgba(255,255,255,0.55);font-size:0.85rem">ISS Research</span>
+            <a href="/about" style="color:rgba(255,255,255,0.55);text-decoration:none;font-size:0.85rem">Documentation</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>
+        <p>© 2026 NASA FIRE-X · NASA Space Apps Challenge</p>
+        <p style="margin-top:4px;color:rgba(0,245,255,0.8);font-size:0.75rem;font-family:'JetBrains Mono',monospace;"></p>
+      </div>
+      <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+<p>Data: NASA Physical Science Informatics (PSI) · 892 canonical experiments</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="/static/js/nav.js?v=6.0"></script>
+<script>
+// UTC Clock - run immediately, then every second
+function updateClock() {
+  const now = new Date();
+  const utc = now.toISOString().replace('T',' ').substring(0,19) + ' UTC';
+  const el = document.getElementById('hero-clock-val');
+  if (el) el.textContent = utc;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// Counter animation with database dynamic fetch
+const counters = [
+  { id: 'stat-exp', target: 892, suffix: '', decimals: 0 },
+  { id: 'stat-fam', target: 29, suffix: '', decimals: 0 },
+  { id: 'stat-scen', target: 7, suffix: '', decimals: 0 },
+  { id: 'stat-int', target: 99.8, suffix: '%', decimals: 1 }
+];
+
+const animateCounter = (el, target, suffix, decimals) => {
+  const duration = 1600;
+  const start = performance.now();
+  const step = (now) => {
+    const progress = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    const val = target * ease;
+    el.textContent = (decimals ? val.toFixed(decimals) : Math.floor(val)) + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+};
+
+function runStatsAnimation() {
+  counters.forEach(c => {
+    const el = document.getElementById(c.id);
+    if (el) animateCounter(el, c.target, c.suffix, c.decimals);
+  });
+}
+
+// Fetch live database stats
+fetch('/api/stats')
+  .then(res => res.json())
+  .then(json => {
+    if (json.success && json.data) {
+      if (json.data.total_experiments) counters[0].target = json.data.total_experiments;
+      if (json.data.total_families) counters[1].target = json.data.total_families;
+    }
+  })
+  .catch(() => {})
+  .finally(() => {
+    runStatsAnimation();
+  });
+
+// Three.js particle system — microgravity fire particles
+(function() {
+  const canvas = document.getElementById('particles-canvas');
+  if (!canvas) return;
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js';
+  script.onload = () => initParticles(canvas);
+  document.head.appendChild(script);
+})();
+
+function initParticles(canvas) {
+  if (typeof THREE === 'undefined') return;
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(canvas.parentElement.clientWidth, canvas.parentElement.clientHeight);
+  renderer.setClearColor(0x000000, 0);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, canvas.parentElement.clientWidth / canvas.parentElement.clientHeight, 0.1, 1000);
+  camera.position.z = 5;
+
+  const N = 1200;
+  const positions = new Float32Array(N * 3);
+  const colors = new Float32Array(N * 3);
+  const sizes = new Float32Array(N);
+  const velocities = [];
+
+  for (let i = 0; i < N; i++) {
+    positions[i*3] = (Math.random() - 0.5) * 14;
+    positions[i*3+1] = (Math.random() - 0.5) * 10;
+    positions[i*3+2] = (Math.random() - 0.5) * 6;
+    const t = Math.random();
+    if (t < 0.5) { colors[i*3]=0; colors[i*3+1]=t*1.96+0.02; colors[i*3+2]=1; }
+    else { colors[i*3]=1; colors[i*3+1]=(1-t)*0.8+0.1; colors[i*3+2]=0; }
+    sizes[i] = Math.random() * 3 + 1;
+    velocities.push({ x:(Math.random()-0.5)*0.002, y:(Math.random()-0.5)*0.002, z:(Math.random()-0.5)*0.001 });
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  geo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+  const mat = new THREE.PointsMaterial({ size: 0.04, vertexColors: true, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false });
+  const particles = new THREE.Points(geo, mat);
+  scene.add(particles);
+
+  let mouseX = 0, mouseY = 0;
+  document.addEventListener('mousemove', e => { mouseX = (e.clientX/window.innerWidth-0.5)*0.5; mouseY = (e.clientY/window.innerHeight-0.5)*0.3; });
+
+  function animate() {
+    requestAnimationFrame(animate);
+    const pos = geo.attributes.position.array;
+    for (let i = 0; i < N; i++) {
+      pos[i*3] += velocities[i].x;
+      pos[i*3+1] += velocities[i].y;
+      pos[i*3+2] += velocities[i].z;
+      if (Math.abs(pos[i*3]) > 7) velocities[i].x *= -1;
+      if (Math.abs(pos[i*3+1]) > 5) velocities[i].y *= -1;
+    }
+    geo.attributes.position.needsUpdate = true;
+    particles.rotation.y += 0.0003;
+    particles.rotation.x += 0.0001;
+    camera.position.x += (mouseX - camera.position.x) * 0.02;
+    camera.position.y += (-mouseY - camera.position.y) * 0.02;
+    camera.lookAt(scene.position);
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    const w = canvas.parentElement.clientWidth, h = canvas.parentElement.clientHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  });
+}
+</script>
+</body>
+</html>
