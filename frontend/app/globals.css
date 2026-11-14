@@ -26,6 +26,10 @@
   --value: #E2E8F0;
   --mono: 'JetBrains Mono', 'Fira Code', monospace;
   --sans: 'Inter', system-ui, sans-serif;
+  /* aliases for components still using --teal */
+  --teal: var(--cyan);
+  --teal-dim: var(--cyan-dim);
+  --teal-glow: var(--cyan-bg);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
