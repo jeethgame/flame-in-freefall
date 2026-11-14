@@ -1,91 +1,101 @@
 /*
- * NASA GLENN LAB AESTHETIC OVERRIDE
- * Industrial, clinical, instrument-grade.
- * Light gray panels on charcoal, zero neon, zero glass, zero rounded corners.
- * Imports AFTER ds.css to override all custom properties.
+ * FLAME IN FREEFALL — EMBER AEROSPACE THEME
+ * Warm fire palette on dark charcoal. Instrument-grade readability.
+ * Amber primary, crimson warnings, no neon, no glass, sharp panels.
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
-  /* ── BACKGROUND: industrial charcoal grades ──── */
-  --bg-void: #111317;
-  --bg-space: #15181E;
-  --bg-surface-1: #1A1D24;
-  --bg-surface-2: #1F222A;
-  --bg-surface-3: #252830;
-  --bg-surface-4: #2C2F38;
+  /* ── BACKGROUND: deep warm charcoal ────────── */
+  --bg-void: #0C0A08;
+  --bg-space: #110F0B;
+  --bg-surface-1: #171410;
+  --bg-surface-2: #1D1A15;
+  --bg-surface-3: #24201A;
+  --bg-surface-4: #2B2720;
 
-  /* ── ACCENTS: instrument-only, semantic ─────── */
-  --neon-cyan: #7EB8C9;
-  --neon-cyan-dim: #5A8FA0;
+  /* ── ACCENTS: fire palette, semantic only ──── */
+  --neon-cyan: #E8A838;        /* amber — primary accent */
+  --neon-cyan-dim: #B8842A;
   --neon-cyan-glow: none;
-  --neon-orange: #D4854A;
+  --neon-orange: #D4603A;      /* deep orange — secondary */
   --neon-orange-glow: none;
-  --neon-blue: #6A8FBF;
-  --electric-purple: #8A7BAD;
-  --neon-green: #6DBF7B;
+  --neon-blue: #8EAFC4;        /* steel blue — info/neutral */
+  --electric-purple: #9B7A6A;  /* muted brown — tertiary */
+  --neon-green: #7AAF5C;       /* sage green — nominal/safe */
 
-  /* ── TEXT: high-contrast clinical ────────────── */
-  --text-white: #F0F1F3;
-  --text-primary: #D4D7DD;
-  --text-secondary: #8B919E;
-  --text-muted: #575D6C;
-  --text-cyan: #7EB8C9;
+  /* ── TEXT: warm neutral ────────────────────── */
+  --text-white: #F2EDE6;
+  --text-primary: #D6CFC4;
+  --text-secondary: #968D80;
+  --text-muted: #5E574D;
+  --text-cyan: #E8A838;
 
-  /* ── BORDERS: visible, structural ──────────── */
-  --border-subtle: rgba(255,255,255,0.08);
-  --border-dim: rgba(255,255,255,0.12);
-  --border-cyan: rgba(126,184,201,0.3);
-  --border-cyan-bright: rgba(126,184,201,0.6);
+  /* ── BORDERS: warm, visible ────────────────── */
+  --border-subtle: rgba(232,168,56,0.06);
+  --border-dim: rgba(255,255,255,0.1);
+  --border-cyan: rgba(232,168,56,0.25);
+  --border-cyan-bright: rgba(232,168,56,0.5);
 
-  /* ── FONTS: Outfit (technical sans) + JetBrains Mono ── */
+  /* ── FONTS ─────────────────────────────────── */
   --font-display: 'Outfit', sans-serif;
   --font-body: 'Outfit', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* ── SHADOWS: flat, no glow ────────────────── */
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+  /* ── SHADOWS: warm, no glow ────────────────── */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.6);
   --shadow-glow-cyan: none;
 
-  /* ── RADII: zero — instrument panels are sharp ── */
+  /* ── RADII: sharp instrument panels ────────── */
   --radius-sm: 2px;
-  --radius-md: 2px;
-  --radius-lg: 3px;
-  --radius-xl: 3px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
   --radius-2xl: 4px;
-  --radius-full: 9999px;  /* keep for status dots only */
+  --radius-full: 9999px;
 }
 
-/* ── KILL ALL NEON GLOW ──────────────────────── */
+/* ── BODY BG ─────────────────────────────────── */
+body {
+  background-color: var(--bg-void) !important;
+}
+
+/* ── KILL NEON GLOW ──────────────────────────── */
 .text-glow-cyan {
   text-shadow: none !important;
   color: var(--neon-cyan) !important;
 }
+
+/* ── BUTTONS: warm flat ──────────────────────── */
+.btn { border-radius: 3px !important; }
+.btn:hover::before { opacity: 0.5 !important; }
 .btn-neon {
   box-shadow: none !important;
+  border-color: var(--neon-cyan) !important;
+  color: var(--neon-cyan) !important;
 }
 .btn-neon:hover {
   box-shadow: none !important;
   transform: none !important;
-  background: rgba(126,184,201,0.08) !important;
+  background: rgba(232,168,56,0.1) !important;
 }
 .btn-solid-cyan {
   box-shadow: none !important;
   background: var(--neon-cyan) !important;
   color: var(--bg-void) !important;
+  font-weight: 700 !important;
 }
 .btn-solid-cyan:hover {
   box-shadow: none !important;
   transform: none !important;
-  background: #92C8D8 !important;
+  background: #F0B848 !important;
 }
 
-/* ── KILL GLASS BLUR (use solid panels) ──────── */
-.glass,
-.glass-bright {
+/* ── GLASS → SOLID PANELS ────────────────────── */
+.glass, .glass-bright {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   background: var(--bg-surface-2) !important;
@@ -93,108 +103,97 @@
   border-radius: var(--radius-md) !important;
 }
 
-/* ── KILL 3D CARD HOVER TILT ─────────────────── */
+/* ── 3D CARD: flat ───────────────────────────── */
 .card-3d:hover {
   transform: none !important;
   box-shadow: var(--shadow-sm) !important;
   border-color: var(--border-cyan) !important;
 }
-.card-3d::before {
-  display: none !important;
-}
+.card-3d::before { display: none !important; }
 
-/* ── KILL GRADIENT TEXT (use solid colors) ──── */
-.text-gradient,
-.text-gradient-fire {
+/* ── GRADIENT TEXT → SOLID ───────────────────── */
+.text-gradient, .text-gradient-fire {
   background: none !important;
   -webkit-background-clip: unset !important;
   -webkit-text-fill-color: unset !important;
   background-clip: unset !important;
 }
 .text-gradient { color: var(--neon-cyan) !important; }
-.text-gradient-fire { color: var(--neon-orange) !important; }
+.text-gradient-fire { color: #D4603A !important; }
 
-/* ── BUTTONS: flat, clinical ─────────────────── */
-.btn {
-  border-radius: 2px !important;
-  letter-spacing: 0.04em !important;
-}
-.btn:hover::before { opacity: 0.5 !important; }
+/* ── BADGES: square, warm ────────────────────── */
+.badge { border-radius: 2px !important; }
+.badge-nominal { background: rgba(122,175,92,0.1) !important; color: #7AAF5C !important; border-color: rgba(122,175,92,0.3) !important; }
+.badge-elevated { background: rgba(212,96,58,0.1) !important; color: #D4603A !important; border-color: rgba(212,96,58,0.3) !important; }
+.badge-critical { background: rgba(207,60,60,0.1) !important; color: #CF3C3C !important; border-color: rgba(207,60,60,0.3) !important; }
+.badge-info { background: rgba(142,175,196,0.1) !important; color: #8EAFC4 !important; border-color: rgba(142,175,196,0.3) !important; }
+.badge-cyan { background: rgba(232,168,56,0.08) !important; color: var(--neon-cyan) !important; border-color: rgba(232,168,56,0.25) !important; }
 
-/* ── BADGES: square, no glow ─────────────────── */
-.badge {
-  border-radius: 2px !important;
-}
+/* ── SECTION EYEBROW ─────────────────────────── */
+.section-eyebrow { color: var(--text-secondary) !important; }
+.section-eyebrow::before { box-shadow: none !important; background: var(--neon-cyan) !important; }
 
-/* ── SECTION EYEBROW: no glow line ───────────── */
-.section-eyebrow::before {
-  box-shadow: none !important;
-  background: var(--text-muted) !important;
-}
-.section-eyebrow {
-  color: var(--text-secondary) !important;
-}
-
-/* ── SCROLLBAR: muted, no cyan ───────────────── */
-::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.15) !important;
-  border-radius: 0 !important;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.25) !important;
-}
-
-/* ── SELECTION: neutral ──────────────────────── */
-::selection {
-  background: rgba(126,184,201,0.3) !important;
-}
-
-/* ── HERO: desaturate, no glow badge ─────────── */
+/* ── HERO: warm overlay ──────────────────────── */
 .hero-badge {
-  background: rgba(126,184,201,0.08) !important;
-  border-color: rgba(126,184,201,0.2) !important;
-  color: var(--text-secondary) !important;
-  border-radius: 2px !important;
+  background: rgba(232,168,56,0.08) !important;
+  border-color: rgba(232,168,56,0.2) !important;
+  color: var(--neon-cyan) !important;
+  border-radius: 3px !important;
 }
 .hero-badge-dot {
   box-shadow: none !important;
   animation: none !important;
   background: var(--neon-green) !important;
 }
-.hero-title {
-  font-family: 'Outfit', sans-serif !important;
+.hero-title { font-family: 'Outfit', sans-serif !important; }
+.hero-overlay {
+  background: linear-gradient(to bottom,
+    rgba(12,10,8,0.2) 0%,
+    rgba(12,10,8,0.5) 50%,
+    rgba(12,10,8,0.95) 85%,
+    #0C0A08 100%
+  ) !important;
 }
 
-/* ── FHI GAUGES: desaturated ─────────────────── */
-.fhi-gauge-ring {
-  filter: saturate(0.6) !important;
+/* ── NAV LOGO: remove old border styling ─────── */
+.nav-brand-logo {
+  border-radius: 4px !important;
+  border: none !important;
+  width: 32px !important;
+  height: 32px !important;
+  object-fit: contain !important;
+}
+/* Footer logo */
+footer img, .site-footer img {
+  border-radius: 4px !important;
+  border: none !important;
 }
 
-/* ── STAT CARDS: flat panels ─────────────────── */
-.stat-card,
-[class*="stat-"] {
-  border-radius: 2px !important;
-}
-
-/* ── TABLES: clinical, dense ─────────────────── */
-table, .data-table {
+/* ── SCROLLBAR: warm ─────────────────────────── */
+::-webkit-scrollbar-thumb {
+  background: rgba(232,168,56,0.2) !important;
   border-radius: 0 !important;
 }
+::-webkit-scrollbar-thumb:hover { background: rgba(232,168,56,0.35) !important; }
+
+/* ── SELECTION ───────────────────────────────── */
+::selection { background: rgba(232,168,56,0.25) !important; }
+
+/* ── TABLES ──────────────────────────────────── */
+table, .data-table { border-radius: 0 !important; }
 th {
   text-transform: uppercase !important;
   font-size: 0.7rem !important;
   letter-spacing: 0.08em !important;
   font-family: var(--font-mono) !important;
   color: var(--text-muted) !important;
-  font-weight: 600 !important;
 }
 
-/* ── DROPDOWNS & INPUTS: flat ────────────────── */
+/* ── INPUTS ──────────────────────────────────── */
 select, input[type="text"], input[type="search"], textarea {
-  border-radius: 2px !important;
+  border-radius: 3px !important;
   background: var(--bg-surface-1) !important;
   border: 1px solid var(--border-dim) !important;
-  color: var(--text-primary) !important;
 }
 select:focus, input:focus, textarea:focus {
   border-color: var(--border-cyan-bright) !important;
@@ -221,24 +220,22 @@ input[type="range"]:active::-webkit-slider-thumb {
   background: var(--neon-cyan) !important;
 }
 
-/* ── FOOTER: clean ───────────────────────────── */
-footer, .site-footer {
-  border-radius: 0 !important;
-}
+/* ── FHI GAUGE: warm colors ──────────────────── */
+.fhi-gauge-ring { filter: hue-rotate(-40deg) saturate(0.7) !important; }
 
-/* ── GRAIN TEXTURE: subtle industrial ────────── */
+/* ── GRAIN ───────────────────────────────────── */
 body::after {
   content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.015;
+  opacity: 0.02;
+  mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 100px;
 }
 
-/* ── REDUCE MOTION ───────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
   body::after { display: none; }
