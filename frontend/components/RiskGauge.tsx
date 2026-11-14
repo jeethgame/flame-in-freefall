@@ -26,17 +26,17 @@ export default function RiskGauge({ score, label }: RiskGaugeProps) {
     return `M ${start.x} ${start.y} A ${radius} ${radius} 0 ${large} 1 ${end.x} ${end.y}`;
   }
 
-  const color = pct < 30 ? "#3fbf6f" : pct < 60 ? "#d4a730" : pct < 80 ? "#c97030" : "#c94444";
+  const color = pct < 30 ? "#22C55E" : pct < 60 ? "#F59E0B" : pct < 80 ? "#EA580C" : "#EF4444";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
       <svg width={180} height={130} viewBox="0 0 180 130">
-        <path d={arc(100)} fill="none" stroke="#1b2332" strokeWidth={8} strokeLinecap="round" />
-        <path d={arc(pct)} fill="none" stroke={color} strokeWidth={8} strokeLinecap="round" style={{ transition: "stroke 0.3s" }} />
+        <path d={arc(100)} fill="none" stroke="#1e293b" strokeWidth={6} strokeLinecap="butt" />
+        <path d={arc(pct)} fill="none" stroke={color} strokeWidth={6} strokeLinecap="butt" style={{ transition: "stroke 0.15s" }} />
         <text x={cx} y={cy + 8} textAnchor="middle" fill={color} fontSize={26} fontWeight="700" fontFamily="JetBrains Mono, monospace">
           {Math.round(pct)}
         </text>
-        <text x={cx} y={cy + 24} textAnchor="middle" fill="#4a5568" fontSize={10} fontFamily="JetBrains Mono, monospace">
+        <text x={cx} y={cy + 24} textAnchor="middle" fill="#475569" fontSize={10} fontFamily="JetBrains Mono, monospace">
           / 100
         </text>
       </svg>

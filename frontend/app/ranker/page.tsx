@@ -65,16 +65,13 @@ export default function RankerPage() {
               <button
                 key={p.id}
                 onClick={() => selectPreset(p.id)}
-                className="mc-card"
-                style={{
-                  cursor: "pointer", textAlign: "left",
-                  borderColor: active ? "var(--teal-dim)" : "var(--border-dim)",
-                  background: active ? "var(--card-alt)" : "var(--card)",
-                }}
+                className="btn"
+                data-active={active}
+                style={{ padding: "8px 12px", textAlign: "left", flexDirection: "column", alignItems: "stretch" }}
               >
                 <div style={{
                   fontSize: 11, fontWeight: 700, marginBottom: 8,
-                  color: active ? "var(--teal)" : "var(--text-bright)",
+                  color: active ? "var(--cyan)" : "var(--text-bright)",
                   letterSpacing: "0.06em",
                 }}>
                   {p.label.toUpperCase()}
@@ -114,20 +111,16 @@ export default function RankerPage() {
             style={{
               flex: 1, padding: "7px 10px",
               background: "var(--bg)", border: "1px solid var(--border)",
-              borderRadius: 3, color: "var(--value)", fontSize: 11,
+              borderRadius: 0, color: "var(--value)", fontSize: 11,
               fontFamily: "var(--mono)", outline: "none",
               letterSpacing: "0.03em",
             }}
           />
           <button
+            className="btn btn-primary"
             onClick={submitQuestion}
             disabled={!question.trim() || loading}
-            style={{
-              background: "var(--teal-glow)", border: "1px solid var(--teal-dim)",
-              color: "var(--teal)", borderRadius: 3, padding: "7px 14px",
-              cursor: "pointer", fontSize: 10, fontWeight: 700,
-              fontFamily: "var(--mono)", letterSpacing: "0.1em",
-            }}
+            style={{ padding: "7px 14px" }}
           >
             QUERY
           </button>
@@ -196,7 +189,7 @@ export default function RankerPage() {
                     </div>
                     <p style={{ fontSize: 11, color: "var(--text)", lineHeight: 1.6, marginBottom: 8 }}>{r.takeaway}</p>
                     {r.key_findings_excerpt && (
-                      <div style={{ background: "var(--bg)", borderRadius: 3, padding: "8px 10px", marginBottom: 8, borderLeft: "2px solid var(--border)" }}>
+                      <div style={{ background: "var(--bg)", borderRadius: 0, padding: "8px 10px", marginBottom: 8, borderLeft: "2px solid var(--border)" }}>
                         <div style={{ fontSize: 9, color: "var(--label)", letterSpacing: "0.1em", fontWeight: 600, marginBottom: 4 }}>KEY FINDINGS</div>
                         <p style={{ fontSize: 10, color: "var(--text)", lineHeight: 1.6 }}>{r.key_findings_excerpt}</p>
                       </div>

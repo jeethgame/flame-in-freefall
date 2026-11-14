@@ -110,7 +110,7 @@ export default function ExplorerPage() {
           placeholder="SEARCH BY NAME, ID, OBJECTIVE, FUEL..."
           style={{
             width: "100%", padding: "6px 10px", marginBottom: 10,
-            background: "var(--bg)", border: "1px solid var(--border-dim)", borderRadius: 3,
+            background: "var(--bg)", border: "1px solid var(--border-dim)", borderRadius: 0,
             color: "var(--text-bright)", fontSize: 10, letterSpacing: "0.05em",
             outline: "none", fontFamily: "var(--mono)",
           }}
@@ -153,8 +153,8 @@ export default function ExplorerPage() {
         <div className="mc-alert teal" style={{ marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <span style={{ fontSize: 10 }}>◈ {selected.length} SELECTED — {selected.join(" · ")}</span>
           <div style={{ display: "flex", gap: 6 }}>
-            <button onClick={() => setSelected([])} style={ghostBtn}>CLEAR</button>
-            <button onClick={openCompare} disabled={selected.length < 2} style={primaryBtn}>COMPARE</button>
+            <button className="btn btn-ghost" onClick={() => setSelected([])}>CLEAR</button>
+            <button className="btn btn-primary" onClick={openCompare} disabled={selected.length < 2}>COMPARE</button>
           </div>
         </div>
       )}
@@ -192,7 +192,7 @@ export default function ExplorerPage() {
                 style={{
                   display: "grid", gridTemplateColumns: "70px 100px 160px 1fr 90px 90px 80px 60px",
                   gap: 8, padding: "8px 14px", cursor: "pointer",
-                  background: isSel ? "var(--teal-glow)" : "var(--card)",
+                  background: "var(--card)",
                   borderLeft: isSel ? "2px solid var(--teal)" : "2px solid transparent",
                   borderBottom: "1px solid var(--border-dim)",
                   transition: "background 0.1s",
@@ -250,29 +250,8 @@ export default function ExplorerPage() {
 
 function Chip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   return (
-    <button
-      onClick={onClick}
-      style={{
-        background: active ? "var(--teal-glow)" : "transparent",
-        border: `1px solid ${active ? "var(--teal-dim)" : "var(--border-dim)"}`,
-        color: active ? "var(--teal)" : "var(--label)",
-        borderRadius: 2, padding: "2px 8px", fontSize: 9, cursor: "pointer",
-        fontFamily: "var(--mono)", fontWeight: 600, letterSpacing: "0.08em",
-        textTransform: "uppercase",
-      }}
-    >
+    <button className="btn" data-active={active} onClick={onClick}>
       {label}
     </button>
   );
 }
-
-const ghostBtn: React.CSSProperties = {
-  background: "transparent", border: "1px solid var(--border)", color: "var(--label)",
-  borderRadius: 2, padding: "3px 10px", fontSize: 9, cursor: "pointer",
-  fontFamily: "var(--mono)", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase",
-};
-const primaryBtn: React.CSSProperties = {
-  background: "var(--teal-glow)", border: "1px solid var(--teal-dim)", color: "var(--teal)",
-  borderRadius: 2, padding: "3px 10px", fontSize: 9, cursor: "pointer",
-  fontFamily: "var(--mono)", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase",
-};

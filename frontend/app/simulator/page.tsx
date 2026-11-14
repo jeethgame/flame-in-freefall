@@ -70,16 +70,7 @@ export default function SimulatorPage() {
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
         <span style={{ fontSize: 9, color: "var(--label)", letterSpacing: "0.1em" }}>PRESETS:</span>
         {Object.entries(PRESETS).map(([id, p]) => (
-          <button
-            key={id}
-            onClick={() => applyPreset(id)}
-            style={{
-              background: "var(--card)", border: "1px solid var(--border-dim)",
-              borderRadius: 3, padding: "3px 8px", fontSize: 9, fontWeight: 600,
-              color: "var(--text)", cursor: "pointer", fontFamily: "var(--mono)",
-              letterSpacing: "0.08em",
-            }}
-          >
+          <button key={id} className="btn" onClick={() => applyPreset(id)}>
             {p.label}
           </button>
         ))}
@@ -110,17 +101,7 @@ export default function SimulatorPage() {
               <span style={{ fontSize: 9, color: "var(--label)", letterSpacing: "0.1em", display: "block", marginBottom: 4 }}>GRAVITY REGIME</span>
               <div style={{ display: "flex", gap: 4 }}>
                 {GRAVITY_OPTS.map((g) => (
-                  <button
-                    key={g.value}
-                    onClick={() => setGravity(g.value)}
-                    style={{
-                      background: gravity === g.value ? "var(--teal-glow)" : "transparent",
-                      border: `1px solid ${gravity === g.value ? "var(--teal-dim)" : "var(--border)"}`,
-                      color: gravity === g.value ? "var(--teal)" : "var(--label)",
-                      borderRadius: 3, padding: "2px 8px", fontSize: 9, fontWeight: 600,
-                      cursor: "pointer", fontFamily: "var(--mono)", letterSpacing: "0.08em",
-                    }}
-                  >
+                  <button key={g.value} className="btn" data-active={gravity === g.value} onClick={() => setGravity(g.value)}>
                     {g.label}
                   </button>
                 ))}
@@ -132,18 +113,7 @@ export default function SimulatorPage() {
               <span style={{ fontSize: 9, color: "var(--label)", letterSpacing: "0.1em", display: "block", marginBottom: 4 }}>FUEL PHASE</span>
               <div style={{ display: "flex", gap: 4 }}>
                 {FUEL_OPTS.map((f) => (
-                  <button
-                    key={f}
-                    onClick={() => setFuelPhase(f)}
-                    style={{
-                      background: fuelPhase === f ? "var(--amber-glow)" : "transparent",
-                      border: `1px solid ${fuelPhase === f ? "#8a6e20" : "var(--border)"}`,
-                      color: fuelPhase === f ? "var(--amber)" : "var(--label)",
-                      borderRadius: 3, padding: "2px 8px", fontSize: 9, fontWeight: 600,
-                      cursor: "pointer", fontFamily: "var(--mono)", letterSpacing: "0.08em",
-                      textTransform: "uppercase",
-                    }}
-                  >
+                  <button key={f} className="btn" data-fuel="true" data-active={fuelPhase === f} onClick={() => setFuelPhase(f)}>
                     {f}
                   </button>
                 ))}

@@ -2,22 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Satoshi:wght@400;500;600;700&display=swap');
 
 :root {
   --bg: #06090F;
   --surface: #0B101B;
-  --card: #0E1420;
+  --card: #0C1119;
   --card-header: #111827;
   --border: #1e293b;
   --border-dim: #1e293b60;
   --cyan: #06B6D4;
   --cyan-dim: #0e7490;
-  --cyan-bg: #06B6D410;
+  --cyan-bg: #06B6D40C;
   --amber: #F59E0B;
-  --amber-bg: #F59E0B10;
+  --amber-bg: #F59E0B0C;
   --red: #EF4444;
-  --red-bg: #EF444410;
+  --red-bg: #EF44440C;
   --green: #22C55E;
   --muted: #475569;
   --label: #64748B;
@@ -25,11 +25,11 @@
   --text-bright: #CBD5E1;
   --value: #E2E8F0;
   --mono: 'JetBrains Mono', 'Fira Code', monospace;
-  --sans: 'Inter', system-ui, sans-serif;
-  /* aliases for components still using --teal */
+  --sans: 'Satoshi', system-ui, sans-serif;
   --teal: var(--cyan);
   --teal-dim: var(--cyan-dim);
   --teal-glow: var(--cyan-bg);
+  --amber-glow: var(--amber-bg);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -47,9 +47,9 @@ body {
 
 ::-webkit-scrollbar { width: 3px; height: 3px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 1px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 0; }
 
-/* ── Core Utilities ───────────────────────────────────── */
+/* ── Section / Layout ─────────────────────────────────── */
 
 .sec-num {
   display: inline-flex;
@@ -57,10 +57,10 @@ body {
   justify-content: center;
   width: 18px;
   height: 18px;
-  border-radius: 2px;
-  background: var(--cyan-bg);
-  border: 1px solid var(--cyan-dim);
-  color: var(--cyan);
+  border-radius: 0;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--label);
   font-size: 9px;
   font-weight: 700;
   flex-shrink: 0;
@@ -78,6 +78,8 @@ body {
   letter-spacing: 0.08em;
   color: var(--text-bright);
 }
+
+/* ── Leader Rows ──────────────────────────────────────── */
 
 .leader-row {
   display: flex;
@@ -112,43 +114,21 @@ body {
 .leader-row .lr-value.amber { color: var(--amber); }
 .leader-row .lr-value.red { color: var(--red); }
 
-.status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 1px 6px;
-  border-radius: 2px;
-  font-size: 9px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-.status-pill::before {
-  content: '';
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-}
-.status-pill.green { background: #16291e; color: var(--green); }
-.status-pill.green::before { background: var(--green); }
-.status-pill.amber { background: #291e16; color: var(--amber); }
-.status-pill.amber::before { background: var(--amber); }
-.status-pill.red { background: #291616; color: var(--red); }
-.status-pill.red::before { background: var(--red); }
-.status-pill.teal, .status-pill.cyan { background: #0c2028; color: var(--cyan); }
-.status-pill.teal::before, .status-pill.cyan::before { background: var(--cyan); }
+/* ── Cards ────────────────────────────────────────────── */
 
 .mc-card {
   background: var(--card);
   border: 1px solid var(--border-dim);
-  border-radius: 2px;
+  border-radius: 0;
   padding: 10px;
 }
+
+/* ── Tags (inline labels) ─────────────────────────────── */
 
 .mc-tag {
   display: inline-block;
   padding: 1px 5px;
-  border-radius: 1px;
+  border-radius: 0;
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -158,25 +138,146 @@ body {
 .mc-tag.teal, .mc-tag.cyan { background: var(--cyan-bg); border: 1px solid var(--cyan-dim); color: var(--cyan); }
 .mc-tag.amber { background: var(--amber-bg); border: 1px solid #92400E; color: var(--amber); }
 .mc-tag.red { background: var(--red-bg); border: 1px solid #991B1B; color: var(--red); }
-.mc-tag.muted { background: #1e293b30; border: 1px solid var(--border); color: var(--label); }
+.mc-tag.muted { background: transparent; border: 1px solid var(--border); color: var(--label); }
+
+/* ── Status Pills ─────────────────────────────────────── */
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 6px;
+  border-radius: 0;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--border);
+}
+.status-pill::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+.status-pill.green { background: transparent; color: var(--green); border-color: #166534; }
+.status-pill.green::before { background: var(--green); }
+.status-pill.amber { background: transparent; color: var(--amber); border-color: #92400E; }
+.status-pill.amber::before { background: var(--amber); }
+.status-pill.red { background: transparent; color: var(--red); border-color: #991B1B; }
+.status-pill.red::before { background: var(--red); }
+.status-pill.teal, .status-pill.cyan { background: transparent; color: var(--cyan); border-color: var(--cyan-dim); }
+.status-pill.teal::before, .status-pill.cyan::before { background: var(--cyan); }
+
+/* ── Alerts ───────────────────────────────────────────── */
 
 .mc-alert {
   display: flex;
   align-items: flex-start;
   gap: 6px;
   padding: 6px 10px;
-  border-radius: 2px;
+  border-radius: 0;
   font-size: 10px;
   line-height: 1.5;
+  border-left: 2px solid;
 }
-.mc-alert.amber { background: #1C1708; border: 1px solid #422006; color: var(--amber); }
-.mc-alert.teal, .mc-alert.cyan { background: #08181C; border: 1px solid #083344; color: var(--cyan); }
-.mc-alert.red { background: #1C0808; border: 1px solid #450a0a; color: var(--red); }
+.mc-alert.amber { background: transparent; border-color: var(--amber); color: var(--amber); }
+.mc-alert.teal, .mc-alert.cyan { background: transparent; border-color: var(--cyan); color: var(--cyan); }
+.mc-alert.red { background: transparent; border-color: var(--red); color: var(--red); }
+
+/* ── BUTTONS: The Aerospace Way ───────────────────────── */
+/* All interactive buttons use these classes. No inline colored backgrounds. */
+
+/* Base: every button starts here */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 0;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--label);
+  cursor: pointer;
+  transition: color 0.1s, border-color 0.1s;
+  user-select: none;
+}
+.btn:hover {
+  color: var(--text);
+  border-color: var(--muted);
+}
+.btn:active {
+  background: var(--border-dim);
+  color: var(--text-bright);
+}
+
+/* Selected state — solid left-edge indicator, no fill */
+.btn[data-active="true"],
+.btn.active {
+  border-color: var(--cyan-dim);
+  color: var(--cyan);
+  border-left: 2px solid var(--cyan);
+}
+
+/* Preset card button (ranker) */
+.btn-preset {
+  composes: btn;
+  padding: 8px 12px;
+  text-align: left;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+.btn-preset[data-active="true"],
+.btn-preset.active {
+  border-color: var(--cyan-dim);
+  border-left: 2px solid var(--cyan);
+}
+
+/* Primary action (compare, query) — inverted */
+.btn-primary {
+  border: 1px solid var(--cyan-dim);
+  background: transparent;
+  color: var(--cyan);
+}
+.btn-primary:hover {
+  background: var(--cyan-bg);
+  color: var(--cyan);
+  border-color: var(--cyan);
+}
+.btn-primary:active {
+  background: var(--cyan-dim);
+  color: var(--bg);
+}
+
+/* Ghost (cancel, clear) */
+.btn-ghost {
+  border-color: transparent;
+  color: var(--muted);
+}
+.btn-ghost:hover {
+  border-color: var(--border);
+  color: var(--label);
+}
+
+/* Fuel phase selector — amber when active, not decoratively */
+.btn[data-fuel="true"][data-active="true"] {
+  border-color: #92400E;
+  color: var(--amber);
+  border-left: 2px solid var(--amber);
+}
+
+/* ── Range Inputs ─────────────────────────────────────── */
 
 input[type="range"] {
   -webkit-appearance: none;
   width: 100%;
-  height: 2px;
+  height: 1px;
   border-radius: 0;
   background: var(--border);
   outline: none;
@@ -184,14 +285,18 @@ input[type="range"] {
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 8px;
-  height: 8px;
-  border-radius: 1px;
-  background: var(--cyan);
+  height: 12px;
+  border-radius: 0;
+  background: var(--text);
   cursor: pointer;
-  border: 1px solid var(--bg);
+  border: none;
+}
+input[type="range"]:active::-webkit-slider-thumb {
+  background: var(--cyan);
 }
 
-/* Recharts */
+/* ── Recharts ─────────────────────────────────────────── */
+
 .recharts-cartesian-grid-horizontal line,
 .recharts-cartesian-grid-vertical line { stroke: var(--border) !important; }
 .recharts-text { fill: var(--label) !important; font-size: 9px !important; font-family: var(--mono) !important; }
@@ -200,26 +305,27 @@ input[type="range"]::-webkit-slider-thumb {
   border: 1px solid var(--border) !important;
   color: var(--text-bright) !important;
   font-size: 10px !important;
-  border-radius: 2px !important;
+  border-radius: 0 !important;
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 .spin { animation: spin 1s linear infinite; }
 
-/* ── Subtle grain (2% opacity, no CRT scanlines) ─────── */
+/* ── Grain texture (2%, no glow, no scanlines) ────────── */
 body::after {
   content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.02;
+  opacity: 0.015;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 128px;
 }
 
 header {
-  box-shadow: 0 1px 0 0 var(--border);
+  box-shadow: none;
+  border-bottom: 1px solid var(--border);
 }
 
 button:focus-visible, a:focus-visible, input:focus-visible {

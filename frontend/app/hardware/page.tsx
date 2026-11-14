@@ -148,13 +148,9 @@ export default function HardwarePage() {
           <div key={section.id} style={{ marginBottom: 12 }}>
             {/* Accordion header */}
             <button
+              className="btn"
               onClick={() => setOpen((p) => ({ ...p, [section.id]: !p[section.id] }))}
-              style={{
-                width: "100%", display: "flex", alignItems: "center", gap: 8,
-                background: "var(--surface)", border: "1px solid var(--border-dim)",
-                borderRadius: isOpen ? "4px 4px 0 0" : 4,
-                padding: "8px 12px", cursor: "pointer", textAlign: "left",
-              }}
+              style={{ width: "100%", padding: "8px 12px", textAlign: "left" }}
             >
               <span className="sec-num">{section.num}</span>
               <span style={{ flex: 1, fontSize: 10, fontWeight: 700, color: "var(--text-bright)", letterSpacing: "0.1em" }}>
@@ -169,7 +165,7 @@ export default function HardwarePage() {
             {isOpen && (
               <div style={{
                 border: "1px solid var(--border-dim)", borderTop: "none",
-                borderRadius: "0 0 4px 4px", background: "var(--card)",
+                background: "var(--card)",
                 padding: 10, display: "flex", flexDirection: "column", gap: 8,
               }}>
                 {section.cards.map((card, i) => (
