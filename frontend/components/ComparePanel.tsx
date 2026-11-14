@@ -1,6 +1,7 @@
 "use client";
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Box, Chip, Table, TableHead, TableBody, TableRow, TableCell } from "@mui/material";
+import { Close as CloseIcon } from "@mui/icons-material";
 import type { Experiment } from "@/lib/types";
-import Badge from "./ui/Badge";
 
 interface ComparePanelProps {
   experiments: Experiment[];
@@ -14,102 +15,65 @@ const ROWS: { key: keyof Experiment; label: string }[] = [
   { key: "o2_percent_min", label: "O₂ MIN (%)" },
   { key: "o2_percent_max", label: "O₂ MAX (%)" },
   { key: "pressure_psi_range", label: "PRESSURE (PSI)" },
-  { key: "airflow_cm_s_min", label: "AIRFLOW MIN (CM/S)" },
-  { key: "airflow_cm_s_max", label: "AIRFLOW MAX (CM/S)" },
-  { key: "gravity_regime", label: "GRAVITY REGIME" },
-  { key: "varied_parameters", label: "VARIED PARAMETERS" },
-  { key: "constant_parameters", label: "CONSTANT PARAMETERS" },
-  { key: "instrumentation", label: "INSTRUMENTATION" },
+  { key: "airflow_cm_s_min", label: "AIRFLOW MIN" },
+  { key: "airflow_cm_s_max", label: "AIRFLOW MAX" },
+  { key: "gravity_regime", label: "GRAVITY" },
+  { key: "varied_parameters", label: "VARIED" },
+  { key: "constant_parameters", label: "CONSTANT" },
+  { key: "instrumentation", label: "SENSORS" },
   { key: "spacecraft_safety_impact", label: "SAFETY IMPACT" },
 ];
 
 function renderVal(v: unknown): React.ReactNode {
-  if (Array.isArray(v)) {
-    return v.map((item, i) => (
-      <span key={i} style={{ display: "block", fontSize: 11, color: "var(--text-bright)" }}>{String(item)}</span>
-    ));
-  }
-  if (v == null) return <span style={{ color: "var(--label)" }}>—</span>;
-  return <span style={{ fontSize: 11, color: "var(--text-bright)" }}>{String(v)}</span>;
+  if (Array.isArray(v)) return v.join(", ");
+  if (v == null) return <Typography variant="caption" sx={{ color: "text.disabled" }}>—</Typography>;
+  return String(v);
 }
 
 export default function ComparePanel({ experiments, onClose }: ComparePanelProps) {
   if (!experiments.length) return null;
   return (
-    <div
-      style={{
-        position: "fixed", inset: 0, background: "rgba(8,12,18,0.92)", zIndex: 100,
-        display: "flex", alignItems: "flex-start", justifyContent: "center",
-        overflowY: "auto", padding: "32px 16px",
-      }}
-      onClick={onClose}
-    >
-      <div
-        className="mc-card"
-        style={{ width: "100%", maxWidth: 1100, padding: 20 }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <div className="sec-header" style={{ margin: 0 }}>
-            <span className="sec-num">⇔</span>
-            EXPERIMENT COMPARISON
-          </div>
-          <button
-            onClick={onClose}
-            style={{
-              background: "none", border: "1px solid var(--border)", borderRadius: 3,
-              color: "var(--label)", cursor: "pointer", padding: "2px 8px", fontSize: 10,
-              letterSpacing: "0.08em",
-            }}
-          >
-            ESC · CLOSE
-          </button>
-        </div>
-
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                <th style={{
-                  padding: "6px 10px", textAlign: "left", fontSize: 9, color: "var(--label)",
-                  borderBottom: "1px solid var(--border)", letterSpacing: "0.1em",
-                  textTransform: "uppercase", width: 140,
-                }}>
-                  FIELD
-                </th>
-                {experiments.map((exp) => (
-                  <th key={exp.psi_id} style={{ padding: "6px 10px", textAlign: "left", borderBottom: "1px solid var(--border)" }}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                      <div style={{ display: "flex", gap: 4 }}>
-                        <Badge label={exp.psi_id} variant="teal" />
-                        <Badge label={exp.hardware_rack} variant="muted" />
-                      </div>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: "var(--value)" }}>{exp.name}</span>
-                    </div>
-                  </th>
+    <Dialog open onClose={onClose} maxWidth="lg" fullWidth>
+      <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", py: 1, px: 2 }}>
+        <Typography variant="h6">EXPERIMENT COMPARISON</Typography>
+        <IconButton onClick={onClose} size="small" sx={{ color: "text.disabled" }}>
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent sx={{ p: 0 }}>
+        <Box sx={{ overflowX: "auto" }}>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ width: 120, color: "text.disabled", fontSize: "0.6rem" }}>FIELD</TableCell>
+                {experiments.map(exp => (
+                  <TableCell key={exp.psi_id}>
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+                      <Chip label={exp.psi_id} size="small" color="primary" variant="outlined" />
+                      <Typography variant="body1" sx={{ fontWeight: 700 }}>{exp.name}</Typography>
+                      <Chip label={exp.hardware_rack} size="small" variant="outlined" sx={{ width: "fit-content" }} />
+                    </Box>
+                  </TableCell>
                 ))}
-              </tr>
-            </thead>
-            <tbody>
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {ROWS.map(({ key, label }) => (
-                <tr key={key} style={{ borderBottom: "1px solid var(--border-dim)" }}>
-                  <td style={{
-                    padding: "6px 10px", fontSize: 9, color: "var(--label)", fontWeight: 600,
-                    verticalAlign: "top", letterSpacing: "0.08em", textTransform: "uppercase",
-                  }}>
+                <TableRow key={key} sx={{ "&:hover": { bgcolor: "action.hover" } }}>
+                  <TableCell sx={{ color: "text.disabled", fontSize: "0.6rem", fontWeight: 600, verticalAlign: "top" }}>
                     {label}
-                  </td>
-                  {experiments.map((exp) => (
-                    <td key={exp.psi_id} style={{ padding: "6px 10px", verticalAlign: "top" }}>
+                  </TableCell>
+                  {experiments.map(exp => (
+                    <TableCell key={exp.psi_id} sx={{ fontSize: "0.7rem", verticalAlign: "top" }}>
                       {renderVal(exp[key])}
-                    </td>
+                    </TableCell>
                   ))}
-                </tr>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+            </TableBody>
+          </Table>
+        </Box>
+      </DialogContent>
+    </Dialog>
   );
 }

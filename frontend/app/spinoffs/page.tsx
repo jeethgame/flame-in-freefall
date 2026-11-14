@@ -1,5 +1,8 @@
 "use client";
-import Badge from "@/components/ui/Badge";
+import {
+  Typography, Chip, Card, CardContent, Paper, Alert, Box, Grid, Stack,
+} from "@mui/material";
+import { Park as EcoIcon } from "@mui/icons-material";
 
 interface SpinoffCard {
   title: string;
@@ -37,69 +40,65 @@ const SPINOFFS: SpinoffCard[] = [
   },
 ];
 
-const PHASES = [
-  { num: "01", label: "DISCOVERY", color: "var(--red)" },
-  { num: "02", label: "TERRESTRIAL APPLICATION", color: "var(--amber)" },
-  { num: "03", label: "CURRENT DEPLOYMENT", color: "var(--green)" },
+const PHASES: { num: string; label: string; color: "error" | "warning" | "success" }[] = [
+  { num: "01", label: "DISCOVERY", color: "error" },
+  { num: "02", label: "TERRESTRIAL APPLICATION", color: "warning" },
+  { num: "03", label: "CURRENT DEPLOYMENT", color: "success" },
 ];
 
 export default function SpinoffsPage() {
   return (
-    <div>
-      <div className="sec-header" style={{ marginBottom: 6 }}>
-        <span className="sec-num">05</span>
-        EARTH FIRE-SAFETY TECHNOLOGY SPINOFFS
-      </div>
-      <p style={{ color: "var(--text)", fontSize: 11, marginBottom: 20 }}>
+    <Box>
+      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
+        <EcoIcon sx={{ fontSize: 16, color: "success.main" }} />
+        <Typography variant="h6">EARTH FIRE-SAFETY TECHNOLOGY SPINOFFS</Typography>
+        <Chip label="05" size="small" color="primary" variant="outlined" sx={{ height: 18, fontSize: "0.6rem" }} />
+      </Stack>
+      <Typography variant="body2" sx={{ mb: 2 }}>
         NASA microgravity combustion research has produced direct technology transfers that save lives on Earth.
-      </p>
+      </Typography>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <Stack spacing={1.5}>
         {SPINOFFS.map((card, idx) => {
           const phaseTexts = [card.discovery, card.application, card.deployment];
           return (
-            <div key={idx} className="mc-card" style={{ padding: 16 }}>
-              {/* Header */}
-              <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--value)" }}>{card.title}</span>
-                <Badge label={card.source} variant="muted" size="md" />
-                {card.psi_ids.map((id) => <Badge key={id} label={id} variant="teal" />)}
-              </div>
+            <Card key={idx}>
+              <CardContent sx={{ p: 1.5, "&:last-child": { pb: 1.5 } }}>
+                <Stack direction="row" spacing={0.5} alignItems="center" flexWrap="wrap" sx={{ mb: 1.5 }}>
+                  <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary" }}>{card.title}</Typography>
+                  <Chip label={card.source} size="small" variant="outlined" sx={{ height: 18, fontSize: "0.6rem" }} />
+                  {card.psi_ids.map((id) => (
+                    <Chip key={id} label={id} size="small" color="primary" variant="outlined" sx={{ height: 18, fontSize: "0.6rem" }} />
+                  ))}
+                </Stack>
 
-              {/* Three phases */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-                {PHASES.map((phase, pi) => (
-                  <div key={pi} style={{ background: "var(--surface)", borderRadius: 3, padding: 10, border: "1px solid var(--border-dim)" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                      <span style={{
-                        display: "inline-flex", alignItems: "center", justifyContent: "center",
-                        width: 18, height: 18, borderRadius: 2, fontSize: 9, fontWeight: 700,
-                        background: `${phase.color}20`, border: `1px solid ${phase.color}60`, color: phase.color,
-                      }}>
-                        {phase.num}
-                      </span>
-                      <span style={{ fontSize: 9, fontWeight: 700, color: phase.color, letterSpacing: "0.1em" }}>
-                        {phase.label}
-                      </span>
-                    </div>
-                    <p style={{ fontSize: 11, color: "var(--text)", lineHeight: 1.6 }}>{phaseTexts[pi]}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+                <Grid container spacing={1}>
+                  {PHASES.map((phase, pi) => (
+                    <Grid item xs={12} md={4} key={pi}>
+                      <Paper sx={{ p: 1, bgcolor: "background.default", height: "100%" }}>
+                        <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 1 }}>
+                          <Chip label={phase.num} size="small" color={phase.color} variant="outlined" sx={{ height: 18, minWidth: 28, fontSize: "0.6rem" }} />
+                          <Typography variant="overline" sx={{ color: `${phase.color}.main` }}>{phase.label}</Typography>
+                        </Stack>
+                        <Typography variant="body2">{phaseTexts[pi]}</Typography>
+                      </Paper>
+                    </Grid>
+                  ))}
+                </Grid>
+              </CardContent>
+            </Card>
           );
         })}
-      </div>
+      </Stack>
 
-      {/* Judge note */}
-      <div className="mc-alert teal" style={{ marginTop: 16 }}>
-        <span style={{ fontWeight: 700, fontSize: 10, letterSpacing: "0.08em" }}>NOTE TO JUDGES:</span>
-        <span style={{ fontSize: 11 }}>
+      <Alert severity="info" variant="outlined" sx={{ mt: 2 }} icon={false}>
+        <Typography variant="overline" sx={{ fontWeight: 700 }}>NOTE TO JUDGES</Typography>
+        <Typography variant="body2" sx={{ color: "text.primary" }}>
           These technology transfers demonstrate that investment in microgravity combustion science generates
           measurable returns for terrestrial fire safety. Future experiments like LUCI (Lunar combustion) and
           FM2 (partial-gravity materials) will extend this pipeline to enable safe human habitation on the Moon and Mars.
-        </span>
-      </div>
-    </div>
+        </Typography>
+      </Alert>
+    </Box>
   );
 }

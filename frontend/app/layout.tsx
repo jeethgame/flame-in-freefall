@@ -3,6 +3,8 @@ import "./globals.css";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { AppBar, Toolbar, Box, Typography, Chip, Tabs, Tab } from "@mui/material";
+import ThemeRegistry from "@/components/ThemeRegistry";
 
 const NAV = [
   { href: "/explorer",  label: "PSI MATRIX",     num: "01" },
@@ -21,14 +23,16 @@ function MissionClock() {
     return () => clearInterval(id);
   }, []);
   return (
-    <span style={{ color: "var(--value)", fontWeight: 700, fontSize: 12, letterSpacing: "0.05em", fontFeatureSettings: "'tnum'" }}>
+    <Typography variant="body1" sx={{ fontWeight: 700, fontSize: "0.85rem", letterSpacing: "0.05em", fontFeatureSettings: "'tnum'", color: "text.primary" }}>
       {time}
-    </span>
+    </Typography>
   );
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const tabIndex = NAV.findIndex(n => pathname === n.href || pathname.startsWith(n.href + "/"));
+
   return (
     <html lang="en">
       <head>
@@ -36,62 +40,54 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body>
-        <header style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)" }}>
-          <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 16px" }}>
-            <div style={{
-              display: "flex", alignItems: "center", justifyContent: "space-between",
-              padding: "6px 0", borderBottom: "1px solid var(--border-dim)",
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ color: "var(--cyan)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em" }}>
+        <ThemeRegistry>
+          <AppBar position="sticky" elevation={0} sx={{ bgcolor: "background.paper", borderBottom: 1, borderColor: "divider" }}>
+            <Toolbar variant="dense" sx={{ minHeight: 32, px: 2, gap: 1, justifyContent: "space-between" }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Typography variant="overline" sx={{ color: "primary.main", fontWeight: 700, letterSpacing: "0.1em", fontSize: "0.65rem" }}>
                   FLAME IN FREEFALL
-                </span>
-                <span style={{ color: "var(--muted)", fontSize: 9, letterSpacing: "0.06em" }}>
+                </Typography>
+                <Typography variant="caption" sx={{ color: "text.disabled" }}>
                   MICROGRAVITY FIRE SAFETY · NASA SPACE APPS 2026
-                </span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                </Typography>
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                 <MissionClock />
-                <span className="status-pill green">ONLINE</span>
-              </div>
-            </div>
+                <Chip label="ONLINE" size="small" color="success" variant="outlined" sx={{ height: 18 }} />
+              </Box>
+            </Toolbar>
 
-            <nav style={{ display: "flex", gap: 0, padding: "2px 0" }}>
-              {NAV.map(({ href, label, num }) => {
-                const active = pathname === href || pathname.startsWith(href + "/");
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    style={{
-                      display: "flex", alignItems: "center", gap: 5,
-                      padding: "4px 12px", fontSize: 9, fontWeight: 600,
-                      fontFamily: "var(--sans)",
-                      letterSpacing: "0.08em", textDecoration: "none",
-                      color: active ? "var(--cyan)" : "var(--label)",
-                      borderBottom: active ? "1px solid var(--cyan)" : "1px solid transparent",
-                    }}
-                  >
-                    <span style={{ fontSize: 8, fontWeight: 700, opacity: 0.4 }}>{num}</span>
-                    {label}
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
-        </header>
+            <Tabs
+              value={tabIndex >= 0 ? tabIndex : false}
+              sx={{ minHeight: 28, px: 2, "& .MuiTabs-indicator": { bgcolor: "primary.main" } }}
+            >
+              {NAV.map(({ href, label, num }, i) => (
+                <Tab
+                  key={href}
+                  component={Link}
+                  href={href}
+                  label={
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      <Typography variant="caption" sx={{ opacity: 0.4, fontWeight: 700 }}>{num}</Typography>
+                      {label}
+                    </Box>
+                  }
+                  sx={{ color: tabIndex === i ? "primary.main" : "text.disabled" }}
+                />
+              ))}
+            </Tabs>
+          </AppBar>
 
-        <main style={{ maxWidth: 1400, margin: "0 auto", padding: "12px 16px 24px" }}>
-          {children}
-        </main>
+          <Box component="main" sx={{ maxWidth: 1400, mx: "auto", px: 2, py: 1.5 }}>
+            {children}
+          </Box>
 
-        <footer style={{
-          borderTop: "1px solid var(--border-dim)", padding: "6px 16px",
-          textAlign: "center", color: "var(--muted)", fontSize: 8,
-          letterSpacing: "0.08em", fontFamily: "var(--sans)",
-        }}>
-          DATA: NASA PSI · PSI.NASA.GOV/PHYSCI/REPO
-        </footer>
+          <Box component="footer" sx={{ borderTop: 1, borderColor: "divider", py: 0.75, px: 2, textAlign: "center" }}>
+            <Typography variant="caption">
+              DATA: NASA PSI · PSI.NASA.GOV/PHYSCI/REPO
+            </Typography>
+          </Box>
+        </ThemeRegistry>
       </body>
     </html>
   );

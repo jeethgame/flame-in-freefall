@@ -1,6 +1,10 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
+import {
+  Box, Paper, Typography, Slider, Button, ButtonGroup, Chip,
+  ToggleButtonGroup, ToggleButton, Alert, Grid,
+} from "@mui/material";
 import { predict } from "@/lib/api";
 import type { PredictResult } from "@/lib/types";
 import RiskGauge from "@/components/RiskGauge";
@@ -29,7 +33,7 @@ export default function SimulatorPage() {
   const [airflow, setAirflow] = useState(5);
   const [co2, setCo2] = useState(0);
   const [he, setHe] = useState(0);
-  const [gravity, setGravity] = useState(0);
+  const [gravity, setGravity] = useState<number>(0);
   const [fuelPhase, setFuelPhase] = useState("Solid");
   const [result, setResult] = useState<PredictResult | null>(null);
   const [error, setError] = useState(false);
@@ -56,141 +60,128 @@ export default function SimulatorPage() {
   }
 
   return (
-    <div>
-      {/* Header */}
-      <div className="sec-header" style={{ marginBottom: 4 }}>
-        <span className="sec-num">03</span>
-        <span>FLAMMABILITY &amp; SUPPRESSION SIMULATOR</span>
-      </div>
-      <p style={{ color: "var(--label)", fontSize: 10, marginBottom: 16, letterSpacing: "0.06em" }}>
+    <Box>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, mb: 0.5 }}>
+        <Chip label="03" size="small" variant="outlined" color="primary" sx={{ height: 18, fontSize: "0.6rem" }} />
+        <Typography variant="h6">FLAMMABILITY & SUPPRESSION SIMULATOR</Typography>
+      </Box>
+      <Typography variant="subtitle1" sx={{ mb: 2 }}>
         GRADIENTBOOSTING MODEL · PHYSICALLY-CALIBRATED PSI DATA · 5,000 SYNTHETIC TRAINING ROWS
-      </p>
+      </Typography>
 
       {/* Presets */}
-      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
-        <span style={{ fontSize: 9, color: "var(--label)", letterSpacing: "0.1em" }}>PRESETS:</span>
-        {Object.entries(PRESETS).map(([id, p]) => (
-          <button key={id} className="btn" onClick={() => applyPreset(id)}>
-            {p.label}
-          </button>
-        ))}
-      </div>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+        <Typography variant="overline">PRESETS:</Typography>
+        <ButtonGroup size="small">
+          {Object.entries(PRESETS).map(([id, p]) => (
+            <Button key={id} variant="outlined" onClick={() => applyPreset(id)}>{p.label}</Button>
+          ))}
+        </ButtonGroup>
+      </Box>
 
-      {/* 3D Flame Comparison Viewport */}
-      <div className="mc-card" style={{ height: 420, marginBottom: 16, position: "relative", padding: 0, overflow: "hidden" }}>
+      {/* 3D Viewport */}
+      <Paper sx={{ height: 420, mb: 2, p: 0, overflow: "hidden", position: "relative" }}>
         <FlameCompareScene o2Percent={o2} pressurePsi={pressure} />
-      </div>
+      </Paper>
 
-      <div style={{ display: "grid", gridTemplateColumns: "340px 1fr", gap: 16 }}>
-        {/* ── Left Column: Controls + Results ── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {/* Sliders */}
-          <div className="mc-card">
-            <div className="sec-header" style={{ marginBottom: 10 }}>
-              <span className="sec-num">▸</span>
-              <span>ENVIRONMENTAL VARIABLES</span>
-            </div>
+      <Grid container spacing={2}>
+        {/* Left: Controls + Results */}
+        <Grid item xs={12} md={4}>
+          <Paper sx={{ p: 1.25, mb: 1.5 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, mb: 1.25 }}>
+              <Chip label="▸" size="small" variant="outlined" color="primary" sx={{ height: 18 }} />
+              <Typography variant="h6">ENVIRONMENTAL VARIABLES</Typography>
+            </Box>
+
             <SliderRow label="O₂ CONCENTRATION" unit="%" value={o2} min={15} max={100} onChange={setO2} />
             <SliderRow label="CABIN PRESSURE" unit="PSI" value={pressure} min={4.3} max={14.7} step={0.1} onChange={setPressure} />
             <SliderRow label="FORCED AIRFLOW" unit="CM/S" value={airflow} min={0} max={30} onChange={setAirflow} />
             <SliderRow label="CO₂ DILUENT" unit="%" value={co2} min={0} max={30} onChange={setCo2} />
             <SliderRow label="HE DILUENT" unit="%" value={he} min={0} max={20} onChange={setHe} />
 
-            {/* Gravity */}
-            <div style={{ marginTop: 8, marginBottom: 8 }}>
-              <span style={{ fontSize: 9, color: "var(--label)", letterSpacing: "0.1em", display: "block", marginBottom: 4 }}>GRAVITY REGIME</span>
-              <div style={{ display: "flex", gap: 4 }}>
-                {GRAVITY_OPTS.map((g) => (
-                  <button key={g.value} className="btn" data-active={gravity === g.value} onClick={() => setGravity(g.value)}>
-                    {g.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <Typography variant="overline" sx={{ display: "block", mt: 1, mb: 0.5 }}>GRAVITY REGIME</Typography>
+            <ToggleButtonGroup
+              exclusive
+              size="small"
+              value={gravity}
+              onChange={(_, v) => { if (v !== null) setGravity(v); }}
+            >
+              {GRAVITY_OPTS.map((g) => (
+                <ToggleButton key={g.value} value={g.value}>{g.label}</ToggleButton>
+              ))}
+            </ToggleButtonGroup>
 
-            {/* Fuel */}
-            <div>
-              <span style={{ fontSize: 9, color: "var(--label)", letterSpacing: "0.1em", display: "block", marginBottom: 4 }}>FUEL PHASE</span>
-              <div style={{ display: "flex", gap: 4 }}>
-                {FUEL_OPTS.map((f) => (
-                  <button key={f} className="btn" data-fuel="true" data-active={fuelPhase === f} onClick={() => setFuelPhase(f)}>
-                    {f}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+            <Typography variant="overline" sx={{ display: "block", mt: 1, mb: 0.5 }}>FUEL PHASE</Typography>
+            <ToggleButtonGroup
+              exclusive
+              size="small"
+              value={fuelPhase}
+              onChange={(_, v) => { if (v !== null) setFuelPhase(v); }}
+              sx={{
+                "& .Mui-selected": {
+                  color: "warning.main !important",
+                  borderColor: "warning.dark !important",
+                  borderLeft: "2px solid",
+                  borderLeftColor: "warning.main !important",
+                },
+              }}
+            >
+              {FUEL_OPTS.map((f) => (
+                <ToggleButton key={f} value={f}>{f}</ToggleButton>
+              ))}
+            </ToggleButtonGroup>
+          </Paper>
 
-          {/* Results */}
           {error ? (
-            <div className="mc-alert red" style={{ fontSize: 10 }}>
-              ⚠ BACKEND OFFLINE — RUN: python -m uvicorn main:app --port 8000
-            </div>
+            <Alert severity="error" variant="outlined" sx={{ fontSize: "0.65rem" }}>
+              BACKEND OFFLINE — RUN: python -m uvicorn main:app --port 8000
+            </Alert>
           ) : result && (
-            <div className="mc-card" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+            <Paper sx={{ p: 1.25, display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
               <RiskGauge score={result.risk_score} label={result.risk_label} />
-              <div style={{ width: "100%", marginTop: 4 }}>
-                <div className="leader-row">
-                  <span className="lr-label">FLAME SPREAD RATE</span>
-                  <span className="lr-dots" />
-                  <span className="lr-value teal">{result.flame_spread_mm_s.toFixed(2)} MM/S</span>
-                </div>
-                <div className="leader-row">
-                  <span className="lr-label">MIN. EXTINCTION O₂ (LOC)</span>
-                  <span className="lr-dots" />
-                  <span className="lr-value amber">{result.extinction_loc_pct.toFixed(1)}%</span>
-                </div>
-              </div>
-            </div>
+              <Box sx={{ width: "100%", mt: 0.5 }}>
+                <MetricRow label="FLAME SPREAD RATE" value={`${result.flame_spread_mm_s.toFixed(2)} MM/S`} color="primary.main" />
+                <MetricRow label="MIN. EXTINCTION O₂ (LOC)" value={`${result.extinction_loc_pct.toFixed(1)}%`} color="warning.main" />
+              </Box>
+            </Paper>
           )}
-        </div>
+        </Grid>
 
-        {/* ── Right Column: Chart + Notes ── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div className="mc-card">
+        {/* Right: Chart + Notes */}
+        <Grid item xs={12} md={8}>
+          <Paper sx={{ p: 1.25, mb: 1.5 }}>
             {result ? (
-              <UCurveChart
-                points={result.u_curve_points}
-                extinctionLoc={result.extinction_loc_pct}
-                currentAirflow={airflow}
-              />
+              <UCurveChart points={result.u_curve_points} extinctionLoc={result.extinction_loc_pct} currentAirflow={airflow} />
             ) : (
-              <div style={{ height: 220, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--label)", fontSize: 10 }}>
-                AWAITING DATA...
-              </div>
+              <Box sx={{ height: 220, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Typography variant="body2">AWAITING DATA...</Typography>
+              </Box>
             )}
-          </div>
+          </Paper>
 
-          <div className="mc-card">
-            <div className="sec-header" style={{ marginBottom: 6 }}>
-              <span className="sec-num">i</span>
-              <span>PHYSICS NOTES</span>
-            </div>
-            <div style={{ fontSize: 10, color: "var(--text)", lineHeight: 1.7 }}>
-              <div className="leader-row" style={{ borderBottom: "1px solid var(--border-dim)", paddingBottom: 4, marginBottom: 4 }}>
-                <span className="lr-label" style={{ color: "var(--teal)" }}>0G &amp; LUNAR (&lt;0.25G)</span>
-                <span className="lr-dots" />
-                <span className="lr-value" style={{ fontSize: 9, color: "var(--text)", fontWeight: 400 }}>DIFFUSION-LIMITED</span>
-              </div>
-              <p style={{ marginBottom: 6, color: "var(--label)", fontSize: 9 }}>
-                NO BUOYANCY → RADIATIVE QUENCH AT ~0 CM/S · PEAK SPREAD 4–8 CM/S · BLOWOFF &gt;15 CM/S
-              </p>
-              <div className="leader-row" style={{ borderBottom: "1px solid var(--border-dim)", paddingBottom: 4, marginBottom: 4 }}>
-                <span className="lr-label" style={{ color: "var(--amber)" }}>MARS &amp; EARTH (≥0.25G)</span>
-                <span className="lr-dots" />
-                <span className="lr-value" style={{ fontSize: 9, color: "var(--text)", fontWeight: 400 }}>BUOYANCY-DRIVEN</span>
-              </div>
-              <p style={{ marginBottom: 6, color: "var(--label)", fontSize: 9 }}>
-                NATURAL CONVECTION ~15–30 CM/S SUSTAINS FLAMES AT 0 FORCED AIRFLOW · RISK MONOTONIC
-              </p>
-              <div className="mc-alert amber" style={{ marginTop: 6, fontSize: 9 }}>
-                ⚠ MOON BASE 34% O₂: &gt;40% HIGHER FLAMMABILITY PER SAFFIRE · PARTIAL-G USES E-FIELD + 0G/1G BOUNDS (LUCI/FM2 PENDING)
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+          <Paper sx={{ p: 1.25 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, mb: 0.75 }}>
+              <Chip label="i" size="small" variant="outlined" color="primary" sx={{ height: 18 }} />
+              <Typography variant="h6">PHYSICS NOTES</Typography>
+            </Box>
+
+            <MetricRow label="0G & LUNAR (<0.25G)" value="DIFFUSION-LIMITED" color="primary.main" />
+            <Typography variant="caption" sx={{ display: "block", mb: 0.75 }}>
+              NO BUOYANCY → RADIATIVE QUENCH AT ~0 CM/S · PEAK SPREAD 4–8 CM/S · BLOWOFF &gt;15 CM/S
+            </Typography>
+
+            <MetricRow label="MARS & EARTH (≥0.25G)" value="BUOYANCY-DRIVEN" color="warning.main" />
+            <Typography variant="caption" sx={{ display: "block", mb: 0.75 }}>
+              NATURAL CONVECTION ~15–30 CM/S SUSTAINS FLAMES AT 0 FORCED AIRFLOW · RISK MONOTONIC
+            </Typography>
+
+            <Alert severity="warning" variant="outlined" sx={{ fontSize: "0.6rem", mt: 0.75 }}>
+              MOON BASE 34% O₂: &gt;40% HIGHER FLAMMABILITY PER SAFFIRE · PARTIAL-G USES E-FIELD + 0G/1G BOUNDS (LUCI/FM2 PENDING)
+            </Alert>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }
 
@@ -198,20 +189,35 @@ function SliderRow({ label, unit, value, min, max, step, onChange }: {
   label: string; unit: string; value: number; min: number; max: number;
   step?: number; onChange: (v: number) => void;
 }) {
+  const display = typeof step === "number" && step < 1 ? value.toFixed(1) : String(value);
   return (
-    <div style={{ marginBottom: 10 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 2 }}>
-        <span style={{ fontSize: 9, color: "var(--label)", letterSpacing: "0.08em" }}>{label}</span>
-        <span style={{ fontSize: 12, fontWeight: 700, color: "var(--value)", fontFamily: "var(--mono)" }}>
-          {typeof step === "number" && step < 1 ? value.toFixed(1) : value}
-          <span style={{ fontSize: 9, color: "var(--label)", marginLeft: 3 }}>{unit}</span>
-        </span>
-      </div>
-      <input
-        type="range" min={min} max={max} step={step ?? 1}
-        value={value} onChange={(e) => onChange(Number(e.target.value))}
-        style={{ width: "100%" }}
+    <Box sx={{ mb: 1.25 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", mb: 0.25 }}>
+        <Typography variant="overline">{label}</Typography>
+        <Typography variant="body1" sx={{ fontWeight: 700, color: "text.primary", fontFeatureSettings: "'tnum'" }}>
+          {display}<Typography component="span" variant="caption" sx={{ ml: 0.5 }}>{unit}</Typography>
+        </Typography>
+      </Box>
+      <Slider
+        value={value}
+        min={min}
+        max={max}
+        step={step ?? 1}
+        onChange={(_, v) => onChange(v as number)}
+        size="small"
       />
-    </div>
+    </Box>
+  );
+}
+
+function MetricRow({ label, value, color }: { label: string; value: string; color: string }) {
+  return (
+    <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.5, py: 0.25 }}>
+      <Typography variant="overline" sx={{ whiteSpace: "nowrap" }}>{label}</Typography>
+      <Box sx={{ flex: 1, borderBottom: "1px dotted", borderColor: "divider", mb: 0.4 }} />
+      <Typography variant="body1" sx={{ fontWeight: 600, color, fontFeatureSettings: "'tnum'", whiteSpace: "nowrap" }}>
+        {value}
+      </Typography>
+    </Box>
   );
 }

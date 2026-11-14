@@ -1,16 +1,21 @@
 "use client";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { Loader2 } from "lucide-react";
+import {
+  Box, Paper, Typography, TextField, Button, Chip, Alert,
+  Card, CardActionArea, CardContent, CircularProgress, Stack,
+} from "@mui/material";
+import { Send, Info } from "@mui/icons-material";
+import { InputAdornment } from "@mui/material";
 import { synthesize, getMissionPresets } from "@/lib/api";
 import type { MissionPreset, SynthesisResult } from "@/lib/types";
 
 const LunarHabitatScene = dynamic(() => import("@/components/three/LunarHabitatScene"), { ssr: false });
 
 function scoreColor(s: number) {
-  if (s >= 80) return "var(--teal)";
-  if (s >= 60) return "var(--amber)";
-  return "var(--label)";
+  if (s >= 80) return "primary.main";
+  if (s >= 60) return "warning.main";
+  return "text.disabled";
 }
 
 export default function RankerPage() {
@@ -43,179 +48,185 @@ export default function RankerPage() {
   }
 
   return (
-    <div>
-      {/* Header */}
-      <div className="sec-header" style={{ marginBottom: 4 }}>
-        <span className="sec-num">02</span>
-        MISSION SAFETY RANKER
-      </div>
-      <p style={{ color: "var(--text)", fontSize: 11, marginBottom: 20 }}>
+    <Box>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
+        <Chip label="02" size="small" variant="outlined" color="primary" sx={{ fontWeight: 700 }} />
+        <Typography variant="h6">MISSION SAFETY RANKER</Typography>
+      </Box>
+      <Typography variant="body2" sx={{ mb: 2 }}>
         SELECT A MISSION ENVIRONMENT OR SUBMIT AN ENGINEERING QUERY. AI RANKS RELEVANT PSI INVESTIGATIONS.
-      </p>
+      </Typography>
 
-      {/* ── Mission Presets ───────────────────────────── */}
-      <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 9, color: "var(--label)", letterSpacing: "0.1em", marginBottom: 8, fontWeight: 600 }}>
-          MISSION ENVIRONMENT PRESETS
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 6 }}>
-          {presets.map((p) => {
-            const active = activePreset === p.id;
-            return (
-              <button
-                key={p.id}
-                onClick={() => selectPreset(p.id)}
-                className="btn"
-                data-active={active}
-                style={{ padding: "8px 12px", textAlign: "left", flexDirection: "column", alignItems: "stretch" }}
-              >
-                <div style={{
-                  fontSize: 11, fontWeight: 700, marginBottom: 8,
-                  color: active ? "var(--cyan)" : "var(--text-bright)",
+      {/* Presets */}
+      <Typography variant="overline" sx={{ mb: 1, display: "block" }}>MISSION ENVIRONMENT PRESETS</Typography>
+      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 0.75, mb: 2 }}>
+        {presets.map((p) => {
+          const active = activePreset === p.id;
+          return (
+            <Card
+              key={p.id}
+              sx={{
+                borderLeft: active ? "2px solid" : "2px solid transparent",
+                borderLeftColor: active ? "primary.main" : "transparent",
+              }}
+            >
+              <CardActionArea onClick={() => selectPreset(p.id)} sx={{ p: 1.25 }}>
+                <Typography variant="body1" sx={{
+                  fontWeight: 700, mb: 1,
+                  color: active ? "primary.main" : "text.primary",
                   letterSpacing: "0.06em",
                 }}>
                   {p.label.toUpperCase()}
-                </div>
-                <div className="leader-row">
-                  <span className="lr-label">O2</span>
-                  <span className="lr-dots" />
-                  <span className={`lr-value ${p.o2_pct >= 34 ? "red" : "teal"}`}>{p.o2_pct}%</span>
-                </div>
-                <div className="leader-row">
-                  <span className="lr-label">PRESSURE</span>
-                  <span className="lr-dots" />
-                  <span className="lr-value">{p.pressure_psi} psi</span>
-                </div>
-                <div className="leader-row">
-                  <span className="lr-label">GRAVITY</span>
-                  <span className="lr-dots" />
-                  <span className="lr-value">{p.gravity_g}g</span>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+                </Typography>
 
-      {/* ── Free text query ───────────────────────────── */}
-      <div className="mc-card" style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 9, color: "var(--label)", letterSpacing: "0.1em", marginBottom: 8, fontWeight: 600 }}>
-          ENGINEERING QUERY
-        </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <input
+                <Stack spacing={0.25}>
+                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography variant="caption">O2</Typography>
+                    <Typography variant="body2" sx={{
+                      fontWeight: 600, fontFeatureSettings: "'tnum'",
+                      color: p.o2_pct >= 34 ? "error.main" : "primary.main",
+                    }}>
+                      {p.o2_pct}%
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography variant="caption">PRESSURE</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600, fontFeatureSettings: "'tnum'" }}>
+                      {p.pressure_psi} psi
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography variant="caption">GRAVITY</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600, fontFeatureSettings: "'tnum'" }}>
+                      {p.gravity_g}g
+                    </Typography>
+                  </Box>
+                </Stack>
+              </CardActionArea>
+            </Card>
+          );
+        })}
+      </Box>
+
+      {/* Query input */}
+      <Paper sx={{ p: 1.25, mb: 2 }}>
+        <Typography variant="overline" sx={{ mb: 1, display: "block" }}>ENGINEERING QUERY</Typography>
+        <Stack direction="row" spacing={1}>
+          <TextField
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && submitQuestion()}
             placeholder="e.g. CO2 suppression at reduced gravity"
-            style={{
-              flex: 1, padding: "7px 10px",
-              background: "var(--bg)", border: "1px solid var(--border)",
-              borderRadius: 0, color: "var(--value)", fontSize: 11,
-              fontFamily: "var(--mono)", outline: "none",
-              letterSpacing: "0.03em",
-            }}
+            fullWidth
+            size="small"
           />
-          <button
-            className="btn btn-primary"
+          <Button
+            variant="contained"
+            size="small"
             onClick={submitQuestion}
             disabled={!question.trim() || loading}
-            style={{ padding: "7px 14px" }}
+            endIcon={<Send sx={{ fontSize: 12 }} />}
+            sx={{ px: 2 }}
           >
             QUERY
-          </button>
-        </div>
-      </div>
+          </Button>
+        </Stack>
+      </Paper>
 
-      {/* ── Warnings ──────────────────────────────────── */}
+      {/* Warnings */}
       {warnings.length > 0 && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 16 }}>
+        <Stack spacing={0.5} sx={{ mb: 2 }}>
           {warnings.map((w, i) => (
-            <div key={i} className={`mc-alert ${w.startsWith("⚠") ? "amber" : "teal"}`}>
-              <span style={{ fontWeight: 700, flexShrink: 0 }}>
-                {w.startsWith("⚠") ? "CAUTION" : "NOTE"}
-              </span>
-              <span>{w.replace(/^[⚠ℹ]\s*/, "")}</span>
-            </div>
+            <Alert
+              key={i}
+              severity={w.startsWith("⚠") ? "warning" : "info"}
+              variant="outlined"
+              sx={{ py: 0 }}
+              icon={<Info sx={{ fontSize: 14 }} />}
+            >
+              <Typography variant="body2" sx={{ color: "inherit" }}>
+                {w.replace(/^[⚠ℹ]\s*/, "")}
+              </Typography>
+            </Alert>
           ))}
-        </div>
+        </Stack>
       )}
 
-      {/* ── Results ───────────────────────────────────── */}
+      {/* Results */}
       {loading ? (
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: 24, color: "var(--label)" }}>
-          <Loader2 size={14} className="spin" color="var(--teal)" />
-          <span style={{ fontSize: 11, letterSpacing: "0.08em" }}>RANKING PSI EXPERIMENTS...</span>
-        </div>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, py: 3, color: "text.disabled" }}>
+          <CircularProgress size={14} color="primary" />
+          <Typography variant="body2">RANKING PSI EXPERIMENTS...</Typography>
+        </Box>
       ) : error ? (
-        <div className="mc-alert red">
-          CONSOLE ERROR — {error}. VERIFY BACKEND: python -m uvicorn main:app --port 8000
-        </div>
+        <Alert severity="error" variant="outlined">
+          {error}. VERIFY BACKEND: python -m uvicorn main:app --port 8000
+        </Alert>
       ) : results.length > 0 ? (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-          {/* Left: ranked results */}
-          <div>
-            <div style={{
-              fontSize: 9, color: "var(--label)", letterSpacing: "0.1em",
-              fontWeight: 600, marginBottom: 10,
-            }}>
+        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+          {/* Ranked results */}
+          <Box>
+            <Typography variant="overline" sx={{ mb: 1.25, display: "block" }}>
               TOP RELEVANT INVESTIGATIONS · {results.length} RESULTS
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            </Typography>
+            <Stack spacing={0.75}>
               {results.map((r, i) => (
-                <div key={r.psi_id} className="mc-card" style={{
-                  display: "grid", gridTemplateColumns: "52px 1fr", gap: 12,
-                }}>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                    <span style={{ fontSize: 9, color: "var(--label)", letterSpacing: "0.1em", fontWeight: 600 }}>RANK</span>
-                    <span style={{ fontSize: 18, fontWeight: 700, color: "var(--text-bright)" }}>
+                <Paper key={r.psi_id} sx={{ p: 1.25, display: "grid", gridTemplateColumns: "48px 1fr", gap: 1.5 }}>
+                  <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.25 }}>
+                    <Typography variant="caption">RANK</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 700, fontSize: "1.1rem" }}>
                       {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <div style={{ marginTop: 4, width: 40, height: 40, position: "relative" }}>
-                      <svg viewBox="0 0 40 40" width={40} height={40}>
-                        <circle cx={20} cy={20} r={16} fill="none" stroke="var(--border)" strokeWidth={2} />
-                        <circle cx={20} cy={20} r={16} fill="none" stroke={scoreColor(r.relevance_score)} strokeWidth={2} strokeDasharray={`${(r.relevance_score / 100) * 100.5} 100.5`} strokeLinecap="round" transform="rotate(-90 20 20)" />
+                    </Typography>
+                    <Box sx={{ width: 36, height: 36, position: "relative", mt: 0.5 }}>
+                      <svg viewBox="0 0 40 40" width={36} height={36}>
+                        <circle cx={20} cy={20} r={16} fill="none" stroke="#1e293b" strokeWidth={2} />
+                        <circle cx={20} cy={20} r={16} fill="none" strokeWidth={2}
+                          stroke={r.relevance_score >= 80 ? "#06B6D4" : r.relevance_score >= 60 ? "#F59E0B" : "#475569"}
+                          strokeDasharray={`${(r.relevance_score / 100) * 100.5} 100.5`}
+                          transform="rotate(-90 20 20)"
+                        />
                       </svg>
-                      <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: scoreColor(r.relevance_score) }}>
+                      <Typography variant="caption" sx={{
+                        position: "absolute", inset: 0, display: "flex", alignItems: "center",
+                        justifyContent: "center", fontWeight: 700, fontSize: "0.6rem",
+                        color: r.relevance_score >= 80 ? "primary.main" : r.relevance_score >= 60 ? "warning.main" : "text.disabled",
+                      }}>
                         {r.relevance_score}
-                      </span>
-                    </div>
-                  </div>
-                  <div>
-                    <div style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 6, flexWrap: "wrap" }}>
-                      <span className="mc-tag teal">{r.psi_id}</span>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text-bright)" }}>{r.name}</span>
-                      <span style={{ fontSize: 10, color: "var(--label)" }}>{r.full_name}</span>
-                    </div>
-                    <p style={{ fontSize: 11, color: "var(--text)", lineHeight: 1.6, marginBottom: 8 }}>{r.takeaway}</p>
-                    {r.key_findings_excerpt && (
-                      <div style={{ background: "var(--bg)", borderRadius: 0, padding: "8px 10px", marginBottom: 8, borderLeft: "2px solid var(--border)" }}>
-                        <div style={{ fontSize: 9, color: "var(--label)", letterSpacing: "0.1em", fontWeight: 600, marginBottom: 4 }}>KEY FINDINGS</div>
-                        <p style={{ fontSize: 10, color: "var(--text)", lineHeight: 1.6 }}>{r.key_findings_excerpt}</p>
-                      </div>
-                    )}
-                    <div style={{ fontSize: 9, color: "var(--label)", letterSpacing: "0.06em" }}>SRC: {r.citation}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+                      </Typography>
+                    </Box>
+                  </Box>
 
-          {/* Right: 3D Lunar Habitat viewport */}
-          <div className="mc-card" style={{ position: "relative", minHeight: 450, padding: 0, overflow: "hidden" }}>
+                  <Box>
+                    <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mb: 0.75, flexWrap: "wrap" }}>
+                      <Chip label={r.psi_id} size="small" color="primary" variant="outlined" />
+                      <Typography variant="body1" sx={{ fontWeight: 700 }}>{r.name}</Typography>
+                      <Typography variant="body2">{r.full_name}</Typography>
+                    </Stack>
+                    <Typography variant="body2" sx={{ mb: 1, lineHeight: 1.6 }}>{r.takeaway}</Typography>
+                    {r.key_findings_excerpt && (
+                      <Box sx={{ bgcolor: "background.default", p: 1, mb: 1, borderLeft: 2, borderColor: "divider" }}>
+                        <Typography variant="overline" sx={{ mb: 0.5, display: "block", fontSize: "0.5rem" }}>KEY FINDINGS</Typography>
+                        <Typography variant="body2" sx={{ lineHeight: 1.6 }}>{r.key_findings_excerpt}</Typography>
+                      </Box>
+                    )}
+                    <Typography variant="caption">SRC: {r.citation}</Typography>
+                  </Box>
+                </Paper>
+              ))}
+            </Stack>
+          </Box>
+
+          {/* 3D viewport */}
+          <Paper sx={{ position: "relative", minHeight: 450, p: 0, overflow: "hidden" }}>
             <LunarHabitatScene />
-          </div>
-        </div>
+          </Paper>
+        </Box>
       ) : (
-        <div className="mc-card" style={{ textAlign: "center", padding: 32, color: "var(--label)" }}>
-          <div style={{ fontSize: 10, letterSpacing: "0.1em", fontWeight: 600 }}>
-            AWAITING INPUT
-          </div>
-          <div style={{ fontSize: 11, marginTop: 6, color: "var(--text)" }}>
-            SELECT A MISSION PRESET OR SUBMIT A QUERY TO RANK PSI EXPERIMENTS
-          </div>
-        </div>
+        <Paper sx={{ textAlign: "center", py: 4 }}>
+          <Typography variant="overline" sx={{ display: "block", mb: 0.5 }}>AWAITING INPUT</Typography>
+          <Typography variant="body2">SELECT A MISSION PRESET OR SUBMIT A QUERY TO RANK PSI EXPERIMENTS</Typography>
+        </Paper>
       )}
-    </div>
+    </Box>
   );
 }

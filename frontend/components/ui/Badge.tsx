@@ -1,13 +1,29 @@
+"use client";
+import { Chip } from "@mui/material";
+
 interface BadgeProps {
   label: string;
-  variant?: "teal" | "amber" | "red" | "muted" | "green";
+  variant?: "teal" | "cyan" | "amber" | "red" | "muted" | "green";
   size?: "sm" | "md";
 }
 
+const COLOR_MAP: Record<string, "primary" | "warning" | "error" | "success" | "default"> = {
+  teal: "primary",
+  cyan: "primary",
+  amber: "warning",
+  red: "error",
+  green: "success",
+  muted: "default",
+};
+
 export default function Badge({ label, variant = "muted", size = "sm" }: BadgeProps) {
   return (
-    <span className={`mc-tag ${variant}`} style={size === "md" ? { fontSize: 10, padding: "2px 8px" } : undefined}>
-      {label}
-    </span>
+    <Chip
+      label={label}
+      size="small"
+      variant="outlined"
+      color={COLOR_MAP[variant] || "default"}
+      sx={size === "md" ? { fontSize: "0.65rem", height: 22 } : { height: 18 }}
+    />
   );
 }
